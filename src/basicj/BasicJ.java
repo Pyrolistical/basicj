@@ -321,4 +321,14 @@ public class BasicJ extends JFrame {
 	public void circle(int x, int y, int r) {
 		scr.circle(x, y, r);
 	}
+	
+	/**
+	 * Draws text.
+	 * The String s is drawn at (x, y), where x, y is the top corner of the 
+	 * String.  The color of the text is the color last set by the color 
+	 * command.
+	 */
+	public void text(int x, int y, String s) {
+		scr.text(x, y, s);
+	}
 }

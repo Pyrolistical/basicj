@@ -31,7 +31,7 @@ import basicj.util.*;
  * input, zoom, keypressed, and mouseclicked commands are implemented in this 
  * class.
  * 
- * The commands text, input, zoom, keypressed, and mouseclicked are not 
+ * The commands input, zoom, keypressed, and mouseclicked are not 
  * implmented yet.
  * 
  * @author Ronald Chen
@@ -318,6 +318,8 @@ final class Screen extends JComponent {
 				g.drawLine(intParam[0], intParam[1], intParam[2], intParam[3]);
 			} else if(id == Command.CIRCLE) {
 				g.drawOval(intParam[0] - intParam[2], intParam[1] - intParam[2], 2*intParam[2], 2*intParam[2]);
+			} else if(id == Command.TEXT) {
+				drawString(g, nextCommand.getStrParam(), intParam[0], intParam[1]);
 			}
 		}
 		drawPending = false;
@@ -516,7 +518,7 @@ final class Screen extends JComponent {
 	}
 	
 	/**
-	 * Impements the circle command.
+	 * Implements the circle command.
 	 */
 	public void circle(int x, int y, int r) {
 		if(r == 0) {
@@ -524,6 +526,13 @@ final class Screen extends JComponent {
 		} else {
 			drawCommand(Command.makeCircle(new int[] {x, y, r}));
 		}
+	}
+	
+	/**
+	 * Implements the text command.
+	 */
+	public void text(int x, int y, String s) {
+		drawCommand(Command.makeText(new int[]{x, y}, s));
 	}
 	
 }
