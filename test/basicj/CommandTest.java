@@ -30,13 +30,6 @@ import junit.framework.TestCase;
  */
 public class CommandTest extends TestCase {
 
-	public void testPrintConstructor() {
-		Command c = Command.makePrint("Hello");
-		assertTrue(c.getCmdID() == Command.PRINT && c.getStrParam().equals("Hello"));
-		
-		c = Command.makePrint("");
-		assertTrue(c.getStrParam().equals(""));
-	}
 	
 	public void testPointConstructor() {
 		Command c = Command.makePoint(new int[] {35, 93});
@@ -124,76 +117,30 @@ public class CommandTest extends TestCase {
 		}
 	}
 	
-	public void testScreenConstructor() {
-		Command c = Command.makeScreen(new int[] {62, 26});
-		assertTrue(c.getCmdID() == Command.SCREEN && Arrays.equals(c.getIntParam(), new int[] {62, 26}));
-		
-		try {
-			c = Command.makeScreen(null);
-			assertTrue(false);
-		} catch(IllegalArgumentException e) {
-		}
-		
-		try {
-			c = Command.makeScreen(new int[3]);
-			assertTrue(false);
-		} catch(IllegalArgumentException e) {
-		}
-		
-		try {
-			c = Command.makeScreen(new int[] {-1, 4});
-			assertTrue(false);
-		} catch(IllegalArgumentException e) {
-		}
-	}
-	
-	public void testZoomConstructor() {
-		Command c = Command.makeZoom(new int[] {2});
-		assertTrue(c.getCmdID() == Command.ZOOM && Arrays.equals(c.getIntParam(), new int[] {2}));
-		
-		try {
-			c = Command.makeZoom(null);
-			assertTrue(false);
-		} catch(IllegalArgumentException e) {
-		}
-		
-		try {
-			c = Command.makeZoom(new int[2]);
-			assertTrue(false);
-		} catch(IllegalArgumentException e) {
-		}
-		
-		try {
-			c = Command.makeZoom(new int[] {-1});
-			assertTrue(false);
-		} catch(IllegalArgumentException e) {
-		}
-	}
-	
 	public void testColorConstructor() {
 		Command c = Command.makeColor(new int[] {62, 26, 222});
 		assertTrue(c.getCmdID() == Command.COLOR && Arrays.equals(c.getIntParam(), new int[] {62, 26, 222}));
 		
 		try {
-			c = Command.makeScreen(null);
+			c = Command.makeColor(null);
 			assertTrue(false);
 		} catch(IllegalArgumentException e) {
 		}
 		
 		try {
-			c = Command.makeScreen(new int[4]);
+			c = Command.makeColor(new int[4]);
 			assertTrue(false);
 		} catch(IllegalArgumentException e) {
 		}
 		
 		try {
-			c = Command.makeScreen(new int[] {-1, 9, 3});
+			c = Command.makeColor(new int[] {-1, 9, 3});
 			assertTrue(false);
 		} catch(IllegalArgumentException e) {
 		}
 		
 		try {
-			c = Command.makeScreen(new int[] {801, 9, 3});
+			c = Command.makeColor(new int[] {801, 9, 3});
 			assertTrue(false);
 		} catch(IllegalArgumentException e) {
 		}
