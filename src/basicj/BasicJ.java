@@ -46,6 +46,27 @@ import javax.swing.*;
  * @author Ronald Chen
  */
 public class BasicJ extends JFrame {
+
+	/*
+	 * static imports is not implemented in Eclipse 3.1 M4
+	 * use static imports once it is implemented.
+	 */
+	public static final int black       = Colors.black;
+	public static final int darkblue    = Colors.darkblue;
+	public static final int darkgreen   = Colors.darkgreen;
+	public static final int darkcyan    = Colors.darkcyan;
+	public static final int darkred     = Colors.darkred;
+	public static final int darkmagenta = Colors.darkmagenta;
+	public static final int darkyellow  = Colors.darkyellow;
+	public static final int gray        = Colors.gray;
+	public static final int darkgray    = Colors.darkgray;
+	public static final int blue        = Colors.blue;
+	public static final int green       = Colors.green;
+	public static final int cyan        = Colors.cyan;
+	public static final int red         = Colors.red;
+	public static final int magenta     = Colors.magenta;
+	public static final int yellow      = Colors.yellow;
+	public static final int white       = Colors.white;
 	
 	/**
 	 * The screen object that implements visual and event commands.
@@ -244,6 +265,14 @@ public class BasicJ extends JFrame {
 	}
 	
 	/**
+	 * Sets the foreground color.
+	 * The parameter is a named color.  See the public statics.
+	 */
+	public void color(int c) {
+		scr.color(Colors.toColor(c));
+	}
+	
+	/**
 	 * Clears the screen.
 	 */
 	public void clear() {
@@ -257,5 +286,21 @@ public class BasicJ extends JFrame {
 	 */
 	public void clear(int r, int g, int b) {
 		scr.clear(new Color(r, g, b));
+	}
+	
+	/**
+	 * Clears the screen to a new background color.
+	 * The parameter is a named color.  See the public statics.
+	 */
+	public void clear(int c) {
+		scr.clear(Colors.toColor(c));
+	}
+	
+	/**
+	 * Draws a pixel.
+	 * The color of the pixel is the color last set by the color command.
+	 */
+	public void point(int x, int y) {
+		scr.point(x, y);
 	}
 }
