@@ -519,7 +519,11 @@ final class Screen extends JComponent {
 	 * Impements the circle command.
 	 */
 	public void circle(int x, int y, int r) {
-		drawCommand(Command.makeCircle(new int[] {x, y, r}));
+		if(r == 0) {
+			drawCommand(Command.makePoint(new int[] {x, y}));
+		} else {
+			drawCommand(Command.makeCircle(new int[] {x, y, r}));
+		}
 	}
 	
 }
