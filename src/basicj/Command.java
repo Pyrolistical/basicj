@@ -30,9 +30,9 @@ import java.util.*;
  * 
  * @author Ronald Chen
  */
-final class Command {
+final class Command {	
 
-	private static final class CommandID {
+	static final class CommandID {
 		
 		private String name;
 		
@@ -44,11 +44,6 @@ final class Command {
 			return name;
 		}
 	}
-	/**
-	 * cmdID for print/println commands
-	 * Parameters for print/println commands are converted to String.
-	 */
-	public static final CommandID PRINT = new CommandID("print");
 	
 	/**
 	 * cmdID for the color commands
@@ -80,34 +75,10 @@ final class Command {
 	 */
 	public static final CommandID TEXT = new CommandID("text");
 	
-	/**
-	 * cmdID for the screen command
-	 * Parameters for screen command are Integer.
-	 */
-	public static final CommandID SCREEN = new CommandID("screen");
-	
-	/**
-	 * cmdID for the zoom command
-	 * Parameters for zoom command are Integer.
-	 */
-	public static final CommandID ZOOM = new CommandID("zoom");
-	
 	private final CommandID cmdID;
 	private final int[] intParam;
 	private final String strParam;
 	
-	/*
-	 * The dummy default constructor.
-	 * This constructs a Command object with <code>getCmdID() == Command.PRINT 
-	 * && getStrParam() == ""</code> is true.  It is not intended to be called 
-	 * directly.  It is only used for Command array construction.
-	 *
-	 */
-	private Command() {
-		cmdID = PRINT;
-		intParam = new int[0];
-		strParam = "";
-	}
 	
 	private Command(CommandID cmdID, int[] intParam, String strParam) {
 		if(intParam == null) throw new IllegalArgumentException("intParam cannot be null");
@@ -125,15 +96,8 @@ final class Command {
 		this(cmdID, intParam, "");
 	}
 	
-	/**
-	 * Makes a new Print Command.
-	 * All top level print/println paramters can be to String, and thus that 
-	 * is done and assigned to strParam.
-	 * @param strParam the data converted to a string to be printed
-	 * @return A Command object where <code>getCmdID() == Command.LINE && getStrParam() == strParam</code> is true
-	 */
-	public static Command makePrint(String strParam) {
-		return new Command(Command.PRINT, strParam);
+	private Command(CommandID cmdID) {
+		this(cmdID, new int[0], "");
 	}
 	
 	/**
@@ -222,35 +186,6 @@ final class Command {
 		return new Command(Command.TEXT, intParam, strParam);
 	}
 	
-	/**
-	 * Makes a new Screen Command.
-	 * The two parameters define a x,y location of big the screen should be.
-	 * Both parameters should be positive.
-	 * @param intParam the x,y of the new screen size
-	 * @return A Command object where <code>getCmdID() == Command.SCREEN && Arrays.equals(getIntParam(), intParam)</code> is true
-	 */
-	public static Command makeScreen(int[] intParam) {
-		if(intParam == null) throw new IllegalArgumentException("intParam cannot be null");
-		if(intParam.length != 2) throw new IllegalArgumentException("intParam must be of length 2, and not " + intParam.length);
-		if(intParam[0] <= 0 || intParam[1] <= 0) throw new IllegalArgumentException("both parameters must be positive");
-		return new Command(Command.SCREEN, intParam);
-	}
-	
-	/**
-	 * Makes a new Zoom Command.
-	 * The parameter define zoom factor.  The zoom factor is defined as the 
-	 * virtual pixel size.  IE. Zoom factor of 3 draws every pixel as a 3x3
-	 * group of pixels of the same color.  The zoom factor must be positive.
-	 * @param intParam the zoom factor
-	 * @return A Command object where <code>getCmdID() == Command.ZOOM && Arrays.equals(getIntParam(), intParam)</code> is true
-	 */
-	public static Command makeZoom(int[] intParam) {
-		if(intParam == null) throw new IllegalArgumentException("intParam cannot be null");
-		if(intParam.length != 1) throw new IllegalArgumentException("intParam must be of length 1, and not " + intParam.length);
-		if(intParam[0] <= 0) throw new IllegalArgumentException("the zoom factor must be positive and not " + intParam[0]);
-		return new Command(Command.ZOOM, intParam);
-	}
-	
 	private int[] copy(int[] intParam) {
 		if(intParam == null) throw new IllegalArgumentException("intParam cannot be null");
 		int[] temp = new int[intParam.length];
@@ -303,4 +238,6 @@ final class Command {
 	public CommandID getCmdID() {
 		return cmdID;
 	}
+
+	
 }
