@@ -19,6 +19,8 @@ package basicj;
 
 import java.util.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+
 import javax.swing.*;
 import basicj.util.*;
 
@@ -33,14 +35,50 @@ import basicj.util.*;
  * 
  * @author Ronald Chen
  */
-final class Screen extends JComponent {
-
+final class Screen extends JComponent {	
+	
 	/**
-	 * Holds point, line, text, circle, and color commands.
-	 * This is a FIFO queue, but it not emptied until the clear command is 
-	 * called.
+	 * Holds the next draw command to be drawn.
 	 */
-	private java.util.List<Command> drawQueue;
+	private Command nextCommand;
+	
+	/**
+	 * The back buffer of the screen.
+	 * The final image is composed in this buffer from the print and draw
+	 * buffers.  If there were no updates, the paint() method just paints this
+	 * buffer.
+	 */
+	private BufferedImage backBuffer;
+	
+	/**
+	 * The back buffer for print commands.
+	 * This layer is where print commands and the background is rendered.
+	 */
+	private BufferedImage textBuffer;
+	
+	/**
+	 * The back buffer for draw commands.
+	 * This layer is where point, line, circle, and text commands are rendered.
+	 * This buffer is only cleared when the clear command is called.  Even when
+	 * a screen command is given, the draw buffer is copied onto the new draw 
+	 * buffer.
+	 */
+	private BufferedImage drawBuffer;
+	
+	/**
+	 * Flag that indicates back buffer needs updating.
+	 */
+	private boolean backPending;
+	
+	/**
+	 * Flag that indicates print buffer needs updating.
+	 */
+	private boolean printPending;
+	
+	/**
+	 * Flag that indicates draw buffer needs updating.
+	 */
+	private boolean drawPending;
 	
 	/**
 	 * Holds the input from print commands.
@@ -105,6 +143,14 @@ final class Screen extends JComponent {
 	private static final Color INITAL_BACKGROUND = Colors.toColor(Colors.black);
 	
 	/**
+	 * A transparent color.
+	 * It is set to a transparent blue, just in case this is painted to an
+	 * image that does not support transparency.  Thus the blue will show
+	 * the error.
+	 */
+	private static final Color TRANSPARENT = new Color(0, 0, 255, 0);
+	
+	/**
 	 * The fixed-width font used to render print and text commands.
 	 */
 	private static final Font f = new Font("Courier New", Font.PLAIN, 12);
@@ -126,13 +172,17 @@ final class Screen extends JComponent {
 	
 	/**
 	 * The current foreground color.
+	 * This variable should not be set directly in any method other than 
+	 * color().
 	 */
 	private Color fgColor;
 	
 	/**
 	 * The current background color.
 	 */
-	private Color bgColor; 
+	private Color bgColor;
+
+	 
 	
 	/**
 	 * Creates a new screen.
@@ -154,26 +204,71 @@ final class Screen extends JComponent {
 		printBuffer = new LinkedList<Pair<Color, StringBuffer>>();
 		lastPrint = new Pair<Color, StringBuffer>(fgColor, new StringBuffer());
 		printBuffer.add(lastPrint);
-		drawQueue = new LinkedList<Command>();
+		nextCommand = null;
+		resetBuffers(INITAL_WIDTH, INITAL_HEIGHT);
 		formatedPrintBuffer = new LinkedList<Pair<Color, StringBuffer>>();
 		
 		screen(INITAL_WIDTH, INITAL_HEIGHT);
+		
 	}
 	
+	/**
+	 * Creates a new buffer set.
+	 * The fields backBuffer, textBuffer, and drawBuffer are initalized with
+	 * new BufferedImage objects.  IE. The old buffers are lost.
+	 */
+	private void resetBuffers(int width, int height) {
+		backBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		textBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		drawBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		clearBuffers();
+	}
+	
+	/**
+	 * Clears all buffers.
+	 * The back buffer is reset to bgColor. 
+	 */
+	private void clearBuffers() {
+		Graphics g = textBuffer.getGraphics();
+		g.setColor(bgColor);
+		g.fillRect(0, 0, textBuffer.getWidth(), textBuffer.getHeight());
+		g = drawBuffer.getGraphics();
+		g.setColor(TRANSPARENT);
+		g.fillRect(0, 0, drawBuffer.getWidth(), drawBuffer.getHeight());
+		backPending = false;
+		printPending = false;
+		drawPending = false;
+	}
+
 	/**
 	 * Paints the visual commands.
 	 */
 	public void paint(Graphics g) {
-		super.paint(g);	
-		
+		if(printPending) {
+			updateTextBuffer();
+		}
+		if(drawPending) {
+			updateDrawBuffer();
+		}
+		if(backPending) {
+			updateBackBuffer();
+		}
+		g.drawImage(backBuffer, 0, 0, this);
+	}
+	
+	/**
+	 * Updates the text buffer.
+	 * The buffer is cleared and the text is re-painted from the 
+	 * formatedPrintBuffer.
+	 */
+	public void updateTextBuffer() {
+		Graphics g = textBuffer.getGraphics();
 		int x = 0;
 		int y = 0;
-		synchronized(bgColor) {
-			g.setColor(bgColor);
-		}
+		
+		g.setColor(bgColor);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		g.setFont(f);
-		g.setColor(fgColor);
 		Pair<Color, StringBuffer> p;
 		synchronized(formatedPrintBuffer) {
 			Iterator<Pair<Color, StringBuffer>> it = formatedPrintBuffer.iterator();
@@ -189,30 +284,38 @@ final class Screen extends JComponent {
 				}
 			}
 		}
-		synchronized(drawQueue) {
-			/*Iterator it = printQueue.iterator();
-			Command c;
-			while(it.hasNext()) {
-				c = (Command) it.next();
-				Command.CommandID id = c.getCmdID();
-				if(id == Command.PRINT) {
-					String s = c.getStrParam();
-					int chunkPoint;
-					while(x + charWidth*s.length() > getWidth()) {
-						chunkPoint = (getWidth() - x)/charWidth;
-						drawString(g, s.substring(0, chunkPoint), x, y);
-						s = s.substring(chunkPoint);
-						x = 0;
-						y += charHeight;
-					}
-					drawString(g, s, x, y);
-					x += charWidth*s.length();
-				} else if(id == Command.NEWLINE) {
-					x = 0;
-					y += charHeight;
-				}
-			}*/
+		printPending = false;
+		backPending = true;
+	}
+	
+	/**
+	 * Updates the back buffer.
+	 * Here is where the textBuffer and drawBuffer is composed on the 
+	 * backBuffer.
+	 */
+	public void updateBackBuffer() {
+		Graphics g = backBuffer.getGraphics();
+		g.drawImage(textBuffer, 0, 0, null);
+		g.drawImage(drawBuffer, 0, 0, null);
+		backPending = false;
+	}
+	
+	/**
+	 * Updates the draw buffer.
+	 * The nextCommand is read and is drawn on to the draw buffer.
+	 */
+	public void updateDrawBuffer() {
+		Graphics g = drawBuffer.getGraphics();
+		
+		if(nextCommand != null) {
+			g.setColor(fgColor);
+			Command.CommandID id = nextCommand.getCmdID();
+			if(id == Command.POINT) {
+				g.drawLine(nextCommand.getIntParam()[0], nextCommand.getIntParam()[1], nextCommand.getIntParam()[0], nextCommand.getIntParam()[1]);
+			}
 		}
+		drawPending = false;
+		backPending = true;
 	}
 	
 	/**
@@ -283,7 +386,7 @@ final class Screen extends JComponent {
 				}
 				printBuffer.clear();
 				it = formatedPrintBuffer.iterator();
-				Pair<Color, StringBuffer> last = new Pair<Color, StringBuffer>(INITAL_FOREGROUND, new StringBuffer());
+				Pair<Color, StringBuffer> last = new Pair<Color, StringBuffer>(fgColor, new StringBuffer());
 				printBuffer.add(last);
 				while(it.hasNext()) {
 					curr = it.next();
@@ -305,15 +408,12 @@ final class Screen extends JComponent {
 	}
 	
 	/**
-	 * Adds a draw command to drawQueue.
-	 * This method is just a wrapper for draqQueue.add(...), since drawQueue
-	 * needs to be synchronized with the paint method.
-	 * @see drawQueue
+	 * Sets the next draw command to be drawn.
 	 */
-	private void addCommand(Command c) {
-		synchronized(drawQueue) {
-			drawQueue.add(c);
-		}
+	private void drawCommand(Command c) {
+		nextCommand = c;
+		drawPending = true;
+		repaint();
 	}
 
 	/**
@@ -326,7 +426,7 @@ final class Screen extends JComponent {
 		lastPrint = new Pair<Color, StringBuffer>(fgColor, new StringBuffer());
 		printBuffer.add(lastPrint);
 		formatedPrintBuffer.clear();
-		drawQueue.clear();
+		clearBuffers();
 		repaint();
 	}
 	
@@ -344,7 +444,6 @@ final class Screen extends JComponent {
 	 * The foreground color is set to c.
 	 */
 	public void color(Color c) {
-		addCommand(Command.makeColor(c));
 		fgColor = c;
 	}
 	/**
@@ -370,9 +469,16 @@ final class Screen extends JComponent {
 	 */
 	public void screen(int width, int height) {
 		setPreferredSize(new Dimension(width, height));
+		
+		BufferedImage tempDrawBuffer = drawBuffer;
+		resetBuffers(width, height);
+		drawBuffer.getGraphics().drawImage(tempDrawBuffer, 0, 0, null);
+		
 		formatPrintBuffer();
+		printPending = true;
+		repaint();
 	}
-	
+
 	/**
 	 * Implements the print command.
 	 * All other types can be casted to type String.
@@ -385,7 +491,15 @@ final class Screen extends JComponent {
 			printBuffer.add(lastPrint);
 		}
 		formatPrintBuffer();
+		printPending = true;
 		repaint();
+	}
+	
+	/**
+	 * Implements the point command.
+	 */
+	public void point(int x, int y) {
+		drawCommand(Command.makePoint(new int[] {x, y}));
 	}
 	
 }
