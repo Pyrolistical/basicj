@@ -303,4 +303,12 @@ public class BasicJ extends JFrame {
 	public void point(int x, int y) {
 		scr.point(x, y);
 	}
+	
+	/**
+	 * Draws a line.
+	 * The color of the line is the color last set by the color command.
+	 */
+	public void line(int x0, int y0, int x1, int y1) {
+		scr.line(x0, y0, x1, y1);
+	}
 }

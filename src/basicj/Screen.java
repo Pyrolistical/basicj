@@ -312,6 +312,8 @@ final class Screen extends JComponent {
 			Command.CommandID id = nextCommand.getCmdID();
 			if(id == Command.POINT) {
 				g.drawLine(nextCommand.getIntParam()[0], nextCommand.getIntParam()[1], nextCommand.getIntParam()[0], nextCommand.getIntParam()[1]);
+			} else if(id == Command.LINE) {
+				g.drawLine(nextCommand.getIntParam()[0], nextCommand.getIntParam()[1], nextCommand.getIntParam()[2], nextCommand.getIntParam()[3]);
 			}
 		}
 		drawPending = false;
@@ -500,6 +502,13 @@ final class Screen extends JComponent {
 	 */
 	public void point(int x, int y) {
 		drawCommand(Command.makePoint(new int[] {x, y}));
+	}
+	
+	/**
+	 * Implements the line command.
+	 */
+	public void line(int x0, int y0, int x1, int y1) {
+		drawCommand(Command.makeLine(new int[] {x0, y0, x1, y1}));
 	}
 	
 }
