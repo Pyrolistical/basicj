@@ -114,7 +114,7 @@ public class ScreenTest extends BasicJ {
 				int r = ((w > h)?h:w);
 				while(true) {
 					color((int) (Math.random()*255), (int) (Math.random()*255), (int) (Math.random()*255));
-					circle((int) (Math.random()*w), (int) (Math.random()*h), (int) (Math.random()*(r - 1)) + 1);
+					circle((int) (Math.random()*w), (int) (Math.random()*h), (int) (Math.random()*r));
 				}
 				//break;
 			default:
