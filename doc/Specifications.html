@@ -1,0 +1,65 @@
+<!-- Author: Pyrolistical Date: Jan 7<br>
+2005 -->
+
+<h1>BasicJ Requirements</h1>
+<h2>Functional Requirements</h2>
+<!-- use manual numbering, so the requirement numbers don't get accidentally changed -->
+<p>1. The "basic form" includes the following commands:<br>
+	<ol type="a">
+		<li>print - prints without new line</li>
+		<li>println - prints with new line</li>
+		<li>input - prompts user for input and returns it</li>
+		<li>color - sets the foreground color for all print/draw commands, and the background optionally.  uses only the standard 16 colors:<br>
+			<ol start="0">
+				<li>black #000000</li>
+				<li>(dark) blue #000080</li>
+				<li>(dark) green #008000</li>
+				<li>(dark) cyan #008080</li>
+				<li>(dark) red #800000</li>
+				<li>(dark) magenta #800080</li>
+				<li>brown/(dark) yellow #808000</li>
+				<li>[light] gray #c0c0c0</li>
+				<li>(dark) gray #808080</li>
+				<li>[light] blue #0000ff</li>
+				<li>[light] green #00ff00</li>
+				<li>[light] cyan #00ffff</li>
+				<li>[light] red #ff0000</li>
+				<li>[light] magenta #ff00ff</li>
+				<li>yellow #ffff00</li>
+				<li>white #ffffff</li>
+			</ol></li>
+		<li>point - draws a pixel at x, y</li>
+		<li>line - draws a line from x0, y0 to x1, y1</li>
+		<li>circle - draws a circle with center x, y and radius of r</li>
+		<li>text - draws a string at x, y</li>
+		<li>width - returns the width of the screen</li>
+		<li>height - returns the height of the screen</li>
+		<li>screen - sets the window size (the space inside the frame, not the size of the frame).  also allows user to tell BasicJ to auto size (0,0)</li>
+		<li>zoom - sets the zoom factor of the screen.  for example zoom 2 draw represents 1 pixel by a 2x2 box of the same color</li>
+		<li>abs - returns the absolution value of a float</li>
+		<li>sqrt - returns the sqrt of a float</li>
+		<li>floor - returns the (int) floor of a float</li>
+		<li>ceil - returns the (int) ceil of a float</li>
+		<li>round - rounds a float to the d decimal places</li>
+		<li>max - returns the max of two floats</li>
+		<li>min - returns the min of two floats</li>
+		<li>sin - returns the sin of degrees</li>
+		<li>cos - returns the cos of degrees</li>
+		<li>tan - returns the tan of degrees</li>
+		<li>asin - returns the arcsin in degrees</li>
+		<li>acos - returns the arctan in degrees</li>
+		<li>atan - returns the arctan in degrees</li>
+		<li>atan2 - returns the arctan with parameters a, b in degrees; special case when b = 0</li>
+		<li>pow - returns the power of base b to exponent e</li>
+		<li>log - returns log base e</li>
+		<li>time - returns the 24 hour time "HH:MM:SS"</li>
+		<li>date - returns the date "YYYY-MM-DD"</li>
+	</ol>
+<i>Note the screen origin at top-left corner of the window.</i>
+</p>
+<p>2. The commands print/draw to a Window, where the "active" space inside the window is the size set by the screen command</p>
+<p>3. If the screen size (due to zoom or otherwise size), then the window should have scrollbars to pan the "screen"</p>
+<p>4. Allow the Window to override the zoom, and reset it to the one set by the program</p>
+<h2>Non-Functional Requirements</h2>
+<p>1. The final product is to be packaged into a Jar file</p>
+<p>2. Documentation available to end-user should be in both JavaDoc and nicely formated manual (ie. the manual should group commands logically, where javadoc does not)</p>
