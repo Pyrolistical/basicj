@@ -31,7 +31,8 @@ import basicj.util.*;
  * input, zoom, keypressed, and mouseclicked commands are implemented in this 
  * class.
  * 
- * Thus far only color, print, println, screen, width, and height are implmented.
+ * The commands text, input, zoom, keypressed, and mouseclicked are not 
+ * implmented yet.
  * 
  * @author Ronald Chen
  */
@@ -310,10 +311,13 @@ final class Screen extends JComponent {
 		if(nextCommand != null) {
 			g.setColor(fgColor);
 			Command.CommandID id = nextCommand.getCmdID();
+			final int[] intParam = nextCommand.getIntParam();
 			if(id == Command.POINT) {
-				g.drawLine(nextCommand.getIntParam()[0], nextCommand.getIntParam()[1], nextCommand.getIntParam()[0], nextCommand.getIntParam()[1]);
+				g.drawLine(intParam[0], intParam[1], intParam[0], intParam[1]);
 			} else if(id == Command.LINE) {
-				g.drawLine(nextCommand.getIntParam()[0], nextCommand.getIntParam()[1], nextCommand.getIntParam()[2], nextCommand.getIntParam()[3]);
+				g.drawLine(intParam[0], intParam[1], intParam[2], intParam[3]);
+			} else if(id == Command.CIRCLE) {
+				g.drawOval(intParam[0] - intParam[2], intParam[1] - intParam[2], 2*intParam[2], 2*intParam[2]);
 			}
 		}
 		drawPending = false;
@@ -509,6 +513,13 @@ final class Screen extends JComponent {
 	 */
 	public void line(int x0, int y0, int x1, int y1) {
 		drawCommand(Command.makeLine(new int[] {x0, y0, x1, y1}));
+	}
+	
+	/**
+	 * Impements the circle command.
+	 */
+	public void circle(int x, int y, int r) {
+		drawCommand(Command.makeCircle(new int[] {x, y, r}));
 	}
 	
 }

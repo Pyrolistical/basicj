@@ -306,9 +306,19 @@ public class BasicJ extends JFrame {
 	
 	/**
 	 * Draws a line.
-	 * The color of the line is the color last set by the color command.
+	 * A line is drawn between the end points (x0, y0) and (x1, y1).  The 
+	 * color of the line is the color last set by the color command.
 	 */
 	public void line(int x0, int y0, int x1, int y1) {
 		scr.line(x0, y0, x1, y1);
+	}
+	
+	/**
+	 * Draws a circle.
+	 * A circle is drawn with (x, y) as its center point and with radius r.
+	 * The color of the circle is the color last set by the color command.
+	 */
+	public void circle(int x, int y, int r) {
+		scr.circle(x, y, r);
 	}
 }
