@@ -28,7 +28,9 @@ public class ScreenTest extends BasicJ {
 
 	public ScreenTest() {
 		super("Screen Test");
-		int test = 3;
+		int w = width();
+		int h = height();
+		int test = 4;
 		switch(test) {
 			case 0:
 				//clear(0, 255, 0);
@@ -82,32 +84,37 @@ public class ScreenTest extends BasicJ {
 				break;
 			case 2:
 				screen(250, 250);
-				int width = width();
-				int height = height();
+				w = width();
+				h = height();
 				int x, y;
 				int i = 1000;
 				while(i-- > 0) {
 					color((int) (Math.random()*255), (int) (Math.random()*255), (int) (Math.random()*255));
-					x = (int) (Math.random()*width);
-					y = (int) (Math.random()*height);
+					x = (int) (Math.random()*w);
+					y = (int) (Math.random()*h);
 					point(x, y);
 				}
 				screen(500, 500);
-				width = width();
-				height = height();
+				w = width();
+				h = height();
 				while(true) {
 					color((int) (Math.random()*255), (int) (Math.random()*255), (int) (Math.random()*255));
-					x = (int) (Math.random()*width);
-					y = (int) (Math.random()*height);
+					x = (int) (Math.random()*w);
+					y = (int) (Math.random()*h);
 					point(x, y);
 				}
 				//break;
 			case 3:
-				int w = width();
-				int h = height();
 				while(true) {
 					color((int) (Math.random()*255), (int) (Math.random()*255), (int) (Math.random()*255));
 					line((int) (Math.random()*w), (int) (Math.random()*h), (int) (Math.random()*w), (int) (Math.random()*h));
+				}
+				//break;
+			case 4:
+				int r = ((w > h)?h:w);
+				while(true) {
+					color((int) (Math.random()*255), (int) (Math.random()*255), (int) (Math.random()*255));
+					circle((int) (Math.random()*w), (int) (Math.random()*h), (int) (Math.random()*(r - 1)) + 1);
 				}
 				//break;
 			default:
