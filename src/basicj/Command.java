@@ -43,12 +43,6 @@ final class Command {
 	}
 	
 	/**
-	 * cmdID for the color commands
-	 * Parameters for color commands are Integer.
-	 */
-	public static final CommandID COLOR = new CommandID("color");
-	
-	/**
 	 * cmdID for the point command
 	 * Parameters for point command are Integer.
 	 */
@@ -75,7 +69,6 @@ final class Command {
 	private final CommandID cmdID;
 	private final int[] intParam;
 	private final String strParam;
-	private final Object objParam;
 	
 	
 	private Command(CommandID cmdID, int[] intParam, String strParam) {
@@ -84,7 +77,6 @@ final class Command {
 		this.cmdID = cmdID;
 		this.intParam = copy(intParam);
 		this.strParam = strParam;
-		this.objParam = null;
 	}
 	
 	private Command(CommandID cmdID, String strParam) {
@@ -97,23 +89,6 @@ final class Command {
 	
 	private Command(CommandID cmdID) {
 		this(cmdID, new int[0], "");
-	}
-	
-	private Command(CommandID cmdID, Object objParam) {
-		if(objParam == null) throw new IllegalArgumentException("objParam cannot be null");
-		this.cmdID = cmdID;
-		this.intParam = new int[0];
-		this.strParam = "";
-		this.objParam = objParam;
-	}
-	
-	/**
-	 * Makes a new Color Command.
-	 * @param objParam cannot be null
-	 * @return A Command object where <code>getCmdID() == Command.COLOR && getObjParam().equals(objParam))</code> is true
-	 */
-	public static Command makeColor(Color objParam) {
-		return new Command(Command.COLOR, objParam);
 	}
 	
 	/**
@@ -212,14 +187,14 @@ final class Command {
 		if(o == null) return false;
 		if(!(o instanceof Command)) return false;
 		Command c = (Command) o;
-		return Arrays.equals(intParam, c.intParam) && strParam.equals(c.strParam) && objParam.equals(c.objParam);
+		return Arrays.equals(intParam, c.intParam) && strParam.equals(c.strParam);
 	}
 	
 	/**
 	 * Returns the hashcode of this Command.
 	 */
 	public int hashCode() {
-		return Arrays.hashCode(intParam) + 17*(strParam.hashCode() + 31*objParam.hashCode());
+		return Arrays.hashCode(intParam) + 17*strParam.hashCode();
 	}
 	
 	/**
@@ -231,15 +206,5 @@ final class Command {
 	 */
 	public CommandID getCmdID() {
 		return cmdID;
-	}
-
-	
-	/**
-	 * Returns the value of objParam
-	 * 
-	 * @return objParam
-	 */
-	public Object getObjParam() {
-		return objParam;
 	}
 }
