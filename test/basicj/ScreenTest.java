@@ -28,7 +28,7 @@ public class ScreenTest extends BasicJ {
 
 	public ScreenTest() {
 		super("Screen Test");
-		int test = 2;
+		int test = 3;
 		switch(test) {
 			case 0:
 				//clear(0, 255, 0);
@@ -101,6 +101,15 @@ public class ScreenTest extends BasicJ {
 					y = (int) (Math.random()*height);
 					point(x, y);
 				}
+				//break;
+			case 3:
+				int w = width();
+				int h = height();
+				while(true) {
+					color((int) (Math.random()*255), (int) (Math.random()*255), (int) (Math.random()*255));
+					line((int) (Math.random()*w), (int) (Math.random()*h), (int) (Math.random()*w), (int) (Math.random()*h));
+				}
+				//break;
 			default:
 				print("Choose a valid test number");
 		}
