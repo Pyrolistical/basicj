@@ -15,13 +15,10 @@
  along with BasicJ; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  ----------------------------------------------------------------------------*/
-
-/*
- * Created on Jan 10, 2005 by Ronald Chen
- */
 package basicj;
 
 import java.util.*;
+import java.awt.*;
 
 /**
  * This immutable class encapsulates print/draw commands.  Command holds a 
@@ -78,6 +75,7 @@ final class Command {
 	private final CommandID cmdID;
 	private final int[] intParam;
 	private final String strParam;
+	private final Object objParam;
 	
 	
 	private Command(CommandID cmdID, int[] intParam, String strParam) {
@@ -86,6 +84,7 @@ final class Command {
 		this.cmdID = cmdID;
 		this.intParam = copy(intParam);
 		this.strParam = strParam;
+		this.objParam = null;
 	}
 	
 	private Command(CommandID cmdID, String strParam) {
@@ -100,26 +99,21 @@ final class Command {
 		this(cmdID, new int[0], "");
 	}
 	
+	private Command(CommandID cmdID, Object objParam) {
+		if(objParam == null) throw new IllegalArgumentException("objParam cannot be null");
+		this.cmdID = cmdID;
+		this.intParam = new int[0];
+		this.strParam = "";
+		this.objParam = objParam;
+	}
+	
 	/**
 	 * Makes a new Color Command.
-	 * Color commands come in two favors.  The parameter is either one integer
-	 * ranging from 0 to 15 (16 standard colors) or 3 integers ranging from 0
-	 * to 255, denoting rgb.
-	 * @param intParam array of paramters of either length 1 or 3
-	 * @return A Command object where <code>getCmdID() == Command.COLOR && Arrays.equals(getIntParam(), intParam)</code> is true
+	 * @param objParam cannot be null
+	 * @return A Command object where <code>getCmdID() == Command.COLOR && getObjParam().equals(objParam))</code> is true
 	 */
-	public static Command makeColor(int[] intParam) {
-		if(intParam == null) throw new IllegalArgumentException("intParam cannot be null");
-		if(intParam.length == 1) {
-			if(intParam[0] < 0 || intParam[0] > 15) throw new IllegalArgumentException("valid named colors range from 0 to 15, color " + intParam[0] + " is invalid");
-		} else if(intParam.length == 3) {
-			if(intParam[0] < 0 || intParam[0] > 255) throw new IllegalArgumentException("valid red component range from 0 to 255, color " + intParam[0] + " is invalid");
-			if(intParam[1] < 0 || intParam[1] > 255) throw new IllegalArgumentException("valid green component range from 0 to 255, color " + intParam[1] + " is invalid");
-			if(intParam[2] < 0 || intParam[2] > 255) throw new IllegalArgumentException("valid blue component range from 0 to 255, color " + intParam[2] + " is invalid");
-		} else {
-			throw new IllegalArgumentException("intParam must be of either contain 1 or 3 paramters, and not " + intParam.length);
-		}
-		return new Command(Command.COLOR, intParam);
+	public static Command makeColor(Color objParam) {
+		return new Command(Command.COLOR, objParam);
 	}
 	
 	/**
@@ -218,14 +212,14 @@ final class Command {
 		if(o == null) return false;
 		if(!(o instanceof Command)) return false;
 		Command c = (Command) o;
-		return Arrays.equals(intParam, c.intParam) && strParam.equals(c.strParam);
+		return Arrays.equals(intParam, c.intParam) && strParam.equals(c.strParam) && objParam.equals(c.objParam);
 	}
 	
 	/**
 	 * Returns the hashcode of this Command.
 	 */
 	public int hashCode() {
-		return Arrays.hashCode(intParam) + 17*strParam.hashCode();
+		return Arrays.hashCode(intParam) + 17*(strParam.hashCode() + 31*objParam.hashCode());
 	}
 	
 	/**
@@ -240,4 +234,12 @@ final class Command {
 	}
 
 	
+	/**
+	 * Returns the value of objParam
+	 * 
+	 * @return objParam
+	 */
+	public Object getObjParam() {
+		return objParam;
+	}
 }
