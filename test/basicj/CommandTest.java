@@ -20,7 +20,6 @@
  */
 package basicj;
 
-import java.awt.Color;
 import java.util.*;
 import junit.framework.TestCase;
 
@@ -116,18 +115,5 @@ public class CommandTest extends TestCase {
 			assertTrue(false);
 		} catch(IllegalArgumentException e) {
 		}
-	}
-	
-	public void testColorConstructor() {
-		Color co = new Color(62, 26, 222);
-		Command c = Command.makeColor(co);
-		assertTrue(c.getCmdID() == Command.COLOR && c.getObjParam().equals(co));
-		
-		try {
-			c = Command.makeColor(null);
-			assertTrue(false);
-		} catch(IllegalArgumentException e) {
-		}
-
 	}
 }
