@@ -1,0 +1,10 @@
+<!-- Author: Pyrolistical, Date: Jan 10, 2005 -->
+<h1>Class Design</h1>
+<p>The BasicJ class extends JFrame, and holds all the logic for the menu and zoom override.</p>
+<p>BasicJ delegates all the core api commands, except the wait command, to the follow classes:
+<ul>
+	<li>Screen - this JComponent handles all the print/drawing, input and event commands (commands: 1a-l, 7a-b)</li>
+	<li>Math - this class handles the number related commands (commands: 1m-af, except 1ae)</li>
+	<li>FileIO - this class handles the file io commands (commands: 7c-f)</li>
+</ul>
+</p>
