@@ -20,6 +20,7 @@ package basicj;
 import java.util.*;
 import java.awt.*;
 import javax.swing.*;
+import basicj.util.*;
 
 /**
  * Handles the visual and event based BasicJ commands.
@@ -28,7 +29,7 @@ import javax.swing.*;
  * input, zoom, keypressed, and mouseclicked commands are implemented in this 
  * class.
  * 
- * Thus far only print, println, screen, width, and height are implmented.
+ * Thus far only color, print, println, screen, width, and height are implmented.
  * 
  * @author Ronald Chen
  */
@@ -42,17 +43,46 @@ final class Screen extends JComponent {
 	private java.util.List<Command> drawQueue;
 	
 	/**
-	 * Holds the input from print(ln) commands.
-	 * The clear command empties this buffer.
+	 * Holds the input from print commands.
+	 * This buffer also stores the current foreground color, for rendering 
+	 * later.  The clear command empties this buffer.
 	 */
-	private StringBuffer printBuffer;
+	private java.util.List<Pair<Color, StringBuffer>> printBuffer;
 	
 	/**
-	 * The printBuffer formated into lines, given by new line breaks and the 
-	 * current screen width.  IE. Each String in this list has length less than
-	 * or equal to the current screen width.
+	 * Holds the last print command.
+	 * This Pair is always the last element in the [code]printBuffer[/code].  
+	 * It is replaced with a new one if the foreground color has changed 
+	 * since the last print command.
+	 * @see printBuffer
 	 */
-	private java.util.List<String> formatedPrintBuffer;
+	private Pair<Color, StringBuffer> lastPrint;
+	
+	/**
+	 * Holds formated version of the printBuffer.
+	 * Elements in this list are the same elements in the printBuffer, except
+	 * that '\n' characters are converted into [code]hardBreak[/code]s and long
+	 * lines are broken up to the screen width using [code]softBreak[/code]s.
+	 * This list is cleared when the clear command is called.
+	 * @see printBuffer, hardBreak, softBreak
+	 */
+	private java.util.List<Pair<Color, StringBuffer>> formatedPrintBuffer;
+	
+	/**
+	 * Represents a hard new line break.
+	 * This Pair is found in the [code]formatedPrintBuffer[/code].  It 
+	 * separates lines of text where '\n' characters are found.
+	 * @see softBreak, formatedPrintBuffer
+	 */
+	private static final Pair<Color, StringBuffer> hardBreak = new Pair<Color, StringBuffer>(null, null);
+	
+	/**
+	 * Represents a soft new line break.
+	 * This Pair is found in the [code]formatedPrintBuffer[/code].  It 
+	 * separates long lines of text on to new lines.
+	 * @see softBreak, formatedPrintBuffer
+	 */
+	private static final Pair<Color, StringBuffer> softBreak = null;
 	
 	/**
 	 * The inital width of the screen.
@@ -65,7 +95,17 @@ final class Screen extends JComponent {
 	private static final int INITAL_HEIGHT = 500;
 	
 	/**
-	 * The fixed-width font used to render print(ln) and text commands.
+	 * The inital foreground color.
+	 */
+	private static final Color INITAL_FOREGROUND = Colors.toColor(Colors.white);
+	
+	/**
+	 * The inital background color.
+	 */
+	private static final Color INITAL_BACKGROUND = Colors.toColor(Colors.black);
+	
+	/**
+	 * The fixed-width font used to render print and text commands.
 	 */
 	private static final Font f = new Font("Courier New", Font.PLAIN, 12);
 	
@@ -96,23 +136,26 @@ final class Screen extends JComponent {
 	
 	/**
 	 * Creates a new screen.
-	 * The new screen has a default size of 500 by 500 with the foreground
-	 * color white and background color black.
+	 * The new screen has a default size of INITAL_WIDTH by INITAL_HEIGHT with 
+	 * the foreground color INITAL_FOREGROUND and background color 
+	 * INITAL_BACKGROUND.
 	 */
 	public Screen() {
 		super();
 		setLayout(null);
-		fgColor = Color.WHITE;
-		bgColor = Color.BLACK;
+		fgColor = INITAL_FOREGROUND;
+		bgColor = INITAL_BACKGROUND;
 		
 		FontMetrics fm = getFontMetrics(f);
 		charWidth = fm.charWidth('a');
 		charHeight = fm.getHeight();
 		charAscent = fm.getAscent();
 		
-		printBuffer = new StringBuffer();
+		printBuffer = new LinkedList<Pair<Color, StringBuffer>>();
+		lastPrint = new Pair<Color, StringBuffer>(fgColor, new StringBuffer());
+		printBuffer.add(lastPrint);
 		drawQueue = new LinkedList<Command>();
-		formatedPrintBuffer = new LinkedList<String>();
+		formatedPrintBuffer = new LinkedList<Pair<Color, StringBuffer>>();
 		
 		screen(INITAL_WIDTH, INITAL_HEIGHT);
 	}
@@ -125,15 +168,25 @@ final class Screen extends JComponent {
 		
 		int x = 0;
 		int y = 0;
-		g.setColor(bgColor);
+		synchronized(bgColor) {
+			g.setColor(bgColor);
+		}
 		g.fillRect(0, 0, getWidth(), getHeight());
 		g.setFont(f);
 		g.setColor(fgColor);
+		Pair<Color, StringBuffer> p;
 		synchronized(formatedPrintBuffer) {
-			Iterator it = formatedPrintBuffer.iterator();
+			Iterator<Pair<Color, StringBuffer>> it = formatedPrintBuffer.iterator();
 			while(it.hasNext()) {
-				drawString(g, (String) it.next(), 0, y);
-				y += charHeight;
+				p = it.next();
+				if(p != hardBreak && p != softBreak) {
+					g.setColor(p.getX());
+					drawString(g, p.getY().toString(), x, y);
+					x += charWidth*p.getY().length();						
+				} else {
+					x = 0;
+					y += charHeight;						
+				}
 			}
 		}
 		synchronized(drawQueue) {
@@ -173,56 +226,127 @@ final class Screen extends JComponent {
 	
 	/**
 	 * Formats printBuffer into formatedPrintBuffer.
-	 * The printBuffer is tokenized by the '\n' character and stored in
-	 * formatedPrintBuffer.  If a token is longer than the current width of 
-	 * the screen, then it is sliced into lines with total widths less than the
-	 * current width.  If the total number of lines in the formatedPrintBuffer
-	 * exceedes the current height of the screen, then the lines at the top
-	 * are trucated until the total number of lines is equal to the current
-	 * height of the screen.
+	 * Any Pair in the printBuffer with the character '\n' in the String is
+	 * separated into two Pairs and a hardBreak between them.  If the String in
+	 * the Pair is longer than the width of the screen minus the current 
+	 * position of the cursor, it is separated into Pairs, so not to exceede 
+	 * the screen width.  Between every new pair is a softBreak.  Otherwise, 
+	 * Pair is just copied.  The result is stored in the formatedPrintBuffer.
+	 * If the total number of lines in the formatedPrintBuffer exceedes the 
+	 * current height of the screen, then the lines at the top are trucated 
+	 * until the total number of lines is equal to the current height of the 
+	 * screen.  If this height trunction occurs, printBuffer is updated 
+	 * accordingly.
+	 * @see formatedPrintBuffer, printBuffer, hardBreak, softBreak
 	 */
 	private void formatPrintBuffer() {
+		final int charsPerWidth = getWidth()/charWidth;
 		synchronized(formatedPrintBuffer) {
 			formatedPrintBuffer.clear();
-			StringTokenizer st = new StringTokenizer(printBuffer.toString(), "\n");
-			final int charsPerWidth = getWidth()/charWidth;
+			
+			Iterator<Pair<Color, StringBuffer>> it = printBuffer.iterator();
+			StringTokenizer st;
 			String s;
-			while(st.hasMoreTokens()) {
-				s = st.nextToken();
-				while(charWidth*s.length() > getWidth()) {
-					formatedPrintBuffer.add(s.substring(0, charsPerWidth));
-					s = s.substring(charsPerWidth);
+			int nLines = 0;
+			Pair<Color, StringBuffer> curr;
+			int cursorX = 0;
+			while(it.hasNext()) {
+				curr = it.next();
+				st = new StringTokenizer(curr.getY().toString(), "\n", true);
+				while(st.hasMoreTokens()) {
+					s = st.nextToken();
+					if(s.equals("\n")) {
+						formatedPrintBuffer.add(hardBreak);
+						cursorX = 0;
+						nLines++;
+						continue;
+					}
+					while(charWidth*(s.length() + cursorX) > getWidth()) {
+						formatedPrintBuffer.add(new Pair<Color, StringBuffer>(curr.getX(), new StringBuffer(s.substring(0, charsPerWidth - cursorX))));
+						s = s.substring(charsPerWidth - cursorX);
+						formatedPrintBuffer.add(softBreak);
+						cursorX = 0;
+						nLines++;
+					}
+					formatedPrintBuffer.add(new Pair<Color, StringBuffer>(curr.getX(), new StringBuffer(s)));
+					cursorX += s.length();
 				}
-				formatedPrintBuffer.add(s);
 			}
-			if(formatedPrintBuffer.size()*charHeight > getHeight()) {
-				while(formatedPrintBuffer.size()*charHeight > getHeight()) {
+
+			if(nLines > 0 && nLines*charHeight >= getHeight()) {
+				while(nLines*charHeight >= getHeight()) {
+					while(formatedPrintBuffer.get(0) != hardBreak && formatedPrintBuffer.get(0) != softBreak) {
+						formatedPrintBuffer.remove(0);
+					}
 					formatedPrintBuffer.remove(0);
+					nLines--;
 				}
-				printBuffer.delete(0, printBuffer.length());
-				Iterator it = formatedPrintBuffer.iterator();
+				printBuffer.clear();
+				it = formatedPrintBuffer.iterator();
+				Pair<Color, StringBuffer> last = new Pair<Color, StringBuffer>(INITAL_FOREGROUND, new StringBuffer());
+				printBuffer.add(last);
 				while(it.hasNext()) {
-					printBuffer.append((String) it.next());
+					curr = it.next();
+					if(curr == hardBreak) {
+						last.getY().append("\n");
+					} else if(curr == softBreak) {
+						if(it.hasNext()) {
+							curr = it.next();
+							last.getY().append(curr.getY().toString());
+						}
+					} else {
+						printBuffer.add(curr);
+						last = curr;
+					}
 				}
+				lastPrint = last;
 			}
 		}
 	}
+	
 	/**
 	 * Adds a draw command to drawQueue.
 	 * This method is just a wrapper for draqQueue.add(...), since drawQueue
 	 * needs to be synchronized with the paint method.
-	 * @param c
+	 * @see drawQueue
 	 */
 	private void addCommand(Command c) {
 		synchronized(drawQueue) {
 			drawQueue.add(c);
 		}
 	}
+
+	/**
+	 * Implements the color command.
+	 * All print and draw commands are lost.  The foreground and background
+	 * colors are unchanged.
+	 */
+	public void clear() {
+		printBuffer.clear();
+		lastPrint = new Pair<Color, StringBuffer>(fgColor, new StringBuffer());
+		printBuffer.add(lastPrint);
+		formatedPrintBuffer.clear();
+		drawQueue.clear();
+		repaint();
+	}
 	
-	/*public void update(Graphics g) {
-		paint(g);
-	}*/
+	/**
+	 * Implements the color command, with optinal background.
+	 * Sets the background color to c.
+	 */
+	public void clear(Color c) {
+		bgColor = c;
+		clear();
+	}
 	
+	/**
+	 * Implements the color command.
+	 * The foreground color is set to c.
+	 */
+	public void color(Color c) {
+		addCommand(Command.makeColor(c));
+		fgColor = c;
+	}
 	/**
 	 * Implements the width command.
 	 * @return the current width of the screen
@@ -254,21 +378,14 @@ final class Screen extends JComponent {
 	 * All other types can be casted to type String.
 	 */
 	public void print(String s) {
-		printBuffer.append(s);
+		if(lastPrint.getX() == fgColor) {
+			lastPrint.getY().append(s);
+		} else {
+			lastPrint = new Pair<Color, StringBuffer>(fgColor, new StringBuffer(s));
+			printBuffer.add(lastPrint);
+		}
 		formatPrintBuffer();
 		repaint();
 	}
-	
-	/**
-	 * Implements the print command.
-	 * All other types can be casted to type String.
-	 */
-	public void println(String s) {
-		printBuffer.append(s);
-		printBuffer.append("\n");
-		formatPrintBuffer();
-		repaint();
-	}
-	
 	
 }
