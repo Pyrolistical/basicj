@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="basicj" default="compile" basedir=".">
-	<property name="build" location="build/"/>
+<project name="basicj" default="all" basedir=".">
+	<property name="build" location="build"/>
 	<property name="dist"  location="${build}/BasicJ/dist"/>
 	<property name="src"  location="${build}/BasicJ/src"/>
 	<property name="bin" location="${build}/BasicJ/bin"/>
-	<property name="test" location="${build}/BasicJ/test/"/>
-	<property name="test-bin" location="${build}/BasicJ/test/bin/"/>
-	<property name="doc" location="${build}/BasicJ/doc/api/"/>
-	<property name="temp" location="${build}/temp/"/>
+	<property name="doc" location="${build}/BasicJ/doc/api"/>
 	
 	<target name="all" depends="clean,dist"/>
 	
@@ -28,7 +25,6 @@
 	
 	<target name="doc">
 		<mkdir dir="${doc}"/>
-		<mkdir dir="${temp}"/>
 		<javadoc packagenames="basicj.*" access="package" sourcepath="${src}" destdir="${doc}">
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
 		</javadoc>
