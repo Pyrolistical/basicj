@@ -30,9 +30,17 @@ public class ScreenTest extends BasicJ {
 		super("Screen Test");
 		int w = width();
 		int h = height();
-		int test = 5;
+        
+        /* 0: text test
+         * 1: random text
+         * 2: random points
+         * 3: random lines
+         * 4: random circles
+         * 5: random characters
+         */
+		int test = 4;
 		switch(test) {
-			case 0:
+			case 0:  // text test
 				//clear(0, 255, 0);
 				screen(300, 350);
 				print("I was here first!");
@@ -76,13 +84,13 @@ public class ScreenTest extends BasicJ {
 				//clear();
 				//println("After clear");
 				break;
-			case 1:
+			case 1:  // random text
 				for(int i = 0; i < 2 << 10; i++) {
 					color((int) (Math.random()*255), (int) (Math.random()*255), (int) (Math.random()*255));
 					print((char) (int) (Math.random()*64 + 64));
 				}
 				break;
-			case 2:
+			case 2:  // random points
 				screen(250, 250);
 				w = width();
 				h = height();
@@ -104,20 +112,20 @@ public class ScreenTest extends BasicJ {
 					point(x, y);
 				}
 				//break;
-			case 3:
+			case 3:  // random lines
 				while(true) {
 					color((int) (Math.random()*255), (int) (Math.random()*255), (int) (Math.random()*255));
 					line((int) (Math.random()*w), (int) (Math.random()*h), (int) (Math.random()*w), (int) (Math.random()*h));
 				}
 				//break;
-			case 4:
+			case 4:  // random circles
 				int r = ((w > h)?h:w);
 				while(true) {
 					color((int) (Math.random()*255), (int) (Math.random()*255), (int) (Math.random()*255));
 					circle((int) (Math.random()*w), (int) (Math.random()*h), (int) (Math.random()*r));
 				}
 				//break;
-			case 5:
+			case 5:  // random characters
 				while(true) {
 					color((int) (Math.random()*255), (int) (Math.random()*255), (int) (Math.random()*255));
 					text((int) (Math.random()*w), (int) (Math.random()*h), String.valueOf((char) (int) (Math.random()*64 + 64)));
