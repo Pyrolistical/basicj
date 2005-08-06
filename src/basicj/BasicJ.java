@@ -19,6 +19,8 @@ package basicj;
 
 import java.awt.*;
 import javax.swing.*;
+import java.util.*;
+import java.util.Timer;
 
 /**
  * The main BasicJ class.
@@ -47,10 +49,7 @@ import javax.swing.*;
  */
 public class BasicJ extends JFrame {
 
-	/*
-	 * static imports is not implemented in Eclipse 3.1 M4
-	 * use static imports once it is implemented.
-	 */
+    
 	public static final int black       = Colors.black;
 	public static final int darkblue    = Colors.darkblue;
 	public static final int darkgreen   = Colors.darkgreen;
@@ -67,11 +66,28 @@ public class BasicJ extends JFrame {
 	public static final int magenta     = Colors.magenta;
 	public static final int yellow      = Colors.yellow;
 	public static final int white       = Colors.white;
+    
+    
+    /**
+     * The inital flush rate.
+     * 
+     * @see #autoFlush(long)
+     */
+    private static final long INITAL_FLUSHRATE = 100;
 	
 	/**
 	 * The screen object that implements visual and event commands.
+     * 
+     * @see #screen(int, int)
 	 */
 	private Screen scr;
+    
+    /**
+     * The auto flush timer.
+     * 
+     * @see #autoFlush(long)
+     */
+    private Timer autoFlusher;
 	
 	/**
 	 * Creates a new BasicJ program and sets the title.
@@ -86,6 +102,8 @@ public class BasicJ extends JFrame {
 		
 		scr = new Screen();
 		add(scr);
+        
+        autoFlush(INITAL_FLUSHRATE);
 		
 		pack();
 		setVisible(true);
@@ -331,4 +349,43 @@ public class BasicJ extends JFrame {
 	public void text(int x, int y, String s) {
 		scr.text(x, y, s);
 	}
+    
+    /**
+     * Renders all text and draw commands immediately.
+     *
+     */
+    public void flush() {
+        scr.flush();
+    }
+    
+    /**
+     * Sets the auto flush rate.
+     * Auto flushing is on by default at a rate of 100ms.  To handle flushing
+     * manually (needed for animation/performance) set the rate to 0, and use
+     * the flush command.
+     *  
+     * @param rate
+     * @see #flush()
+     */
+    public void autoFlush(long rate) {
+        if(rate > 0) {
+            autoFlusher = new Timer();
+            autoFlusher.scheduleAtFixedRate(new AutoFlushTask(), 0, rate);
+        } else {
+            if(autoFlusher != null) {
+                autoFlusher.cancel();
+            }
+        }
+    }
+    
+    /**
+     * Simple TimerTask for auto flushing.
+     * 
+     * @author Ronald Chen
+     */
+    class AutoFlushTask extends TimerTask {
+        public void run() {
+            flush();
+        }
+    }
 }
