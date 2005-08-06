@@ -140,6 +140,11 @@ final class Screen extends JComponent {
 	 * The fixed-width font used to render print and text commands.
 	 */
 	private static final Font f = new Font("Courier New", Font.PLAIN, 12);
+
+    /**
+     * Inital zoom factor.
+     */
+    private static final int INITAL_ZOOMFACTOR = 1;
 	
 	/**
 	 * The character width of f.
@@ -168,6 +173,21 @@ final class Screen extends JComponent {
 	 */
 	private Color bgColor;
 
+    /**
+     * The current zoom factor.
+     */
+    private int zoomFactor;
+
+    /**
+     * The current width.
+     */
+    private int bufferWidth;
+
+    /**
+     * The current height.
+     */
+    private int bufferHeight;
+
 	 
 	
 	/**
@@ -190,10 +210,9 @@ final class Screen extends JComponent {
 		printBuffer = new LinkedList<Pair<Color, StringBuffer>>();
 		lastPrint = new Pair<Color, StringBuffer>(fgColor, new StringBuffer());
 		printBuffer.add(lastPrint);
-
-		resetBuffers(INITAL_WIDTH, INITAL_HEIGHT);
 		formatedPrintBuffer = new LinkedList<Pair<Color, StringBuffer>>();
 		
+        zoomFactor = INITAL_ZOOMFACTOR;
 		screen(INITAL_WIDTH, INITAL_HEIGHT);
 	}
 	
@@ -207,9 +226,9 @@ final class Screen extends JComponent {
      * @see #drawBuffer
      * @see #drawGraphics
 	 */
-	private void resetBuffers(int width, int height) {
-		backBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		drawBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	private void resetBuffers() {
+		backBuffer = new BufferedImage(bufferWidth, bufferHeight, BufferedImage.TYPE_INT_RGB);
+		drawBuffer = new BufferedImage(bufferWidth, bufferHeight, BufferedImage.TYPE_INT_ARGB);
         
         drawGraphics = drawBuffer.getGraphics();
 		clearBuffers();
@@ -225,10 +244,10 @@ final class Screen extends JComponent {
 	private void clearBuffers() {
 		Graphics g = backBuffer.getGraphics();
 		g.setColor(bgColor);
-		g.fillRect(0, 0, backBuffer.getWidth(), backBuffer.getHeight());
+		g.fillRect(0, 0, bufferWidth, bufferHeight);
 
         drawGraphics.setColor(TRANSPARENT);
-        drawGraphics.fillRect(0, 0, drawBuffer.getWidth(), drawBuffer.getHeight());
+        drawGraphics.fillRect(0, 0, bufferWidth, bufferHeight);
         drawGraphics.setColor(fgColor);
 	}
 
@@ -237,7 +256,11 @@ final class Screen extends JComponent {
 	 */
 	public void paint(Graphics g) {
 		updateBackBuffer();
-		g.drawImage(backBuffer, 0, 0, this);
+        if(zoomFactor > 1) {
+            g.drawImage(backBuffer.getScaledInstance(zoomFactor*bufferWidth, zoomFactor*bufferHeight, Image.SCALE_REPLICATE), 0, 0, null);
+        } else {
+            g.drawImage(backBuffer, 0, 0, null);
+        }
 	}
 	
 	/**
@@ -256,7 +279,7 @@ final class Screen extends JComponent {
         int y = 0;
         
         g.setColor(bgColor);
-        g.fillRect(0, 0, getWidth(), getHeight());
+        g.fillRect(0, 0, bufferWidth, bufferHeight);
         g.setFont(f);
         Pair<Color, StringBuffer> p;
         synchronized(formatedPrintBuffer) {
@@ -305,7 +328,7 @@ final class Screen extends JComponent {
      * @see #softBreak
 	 */
 	private void formatPrintBuffer() {
-		final int charsPerWidth = getWidth()/charWidth;
+		final int charsPerWidth = bufferWidth/charWidth;
 		synchronized(formatedPrintBuffer) {
 			formatedPrintBuffer.clear();
 			
@@ -325,7 +348,7 @@ final class Screen extends JComponent {
 						cursorX = 0;
 						nLines++;
 					} else {
-    					while(charWidth*(s.length() + cursorX) > getWidth()) {
+    					while(charWidth*(s.length() + cursorX) > bufferWidth) {
     						formatedPrintBuffer.add(new Pair<Color, StringBuffer>(curr.getX(), new StringBuffer(s.substring(0, charsPerWidth - cursorX))));
     						s = s.substring(charsPerWidth - cursorX);
     						formatedPrintBuffer.add(softBreak);
@@ -338,7 +361,7 @@ final class Screen extends JComponent {
 				}
 			}
 
-			if(nLines > 0 && nLines*charHeight >= getHeight()) {
+			if(nLines > 0 && nLines*charHeight >= bufferHeight) {
 				while(nLines*charHeight >= getHeight()) {
 					while(formatedPrintBuffer.get(0) != hardBreak && formatedPrintBuffer.get(0) != softBreak) {
 						formatedPrintBuffer.remove(0);
@@ -407,7 +430,7 @@ final class Screen extends JComponent {
 	 * @return the current width of the screen
 	 */
 	public int width() {
-		return getWidth();
+        return bufferWidth;
 	}
 	
 	/**
@@ -416,7 +439,7 @@ final class Screen extends JComponent {
 	 * @return the current height of the screen
 	 */
 	public int height() {
-		return getHeight();
+        return bufferHeight;
 	}
 	
 	/**
@@ -428,12 +451,13 @@ final class Screen extends JComponent {
 	 * @param height the new height
 	 */
 	public void screen(int width, int height) {
-		setPreferredSize(new Dimension(width, height));
+        bufferWidth = width;
+        bufferHeight = height;
+        zoom(zoomFactor);
 		
 		BufferedImage tempDrawBuffer = drawBuffer;
-		resetBuffers(width, height);
+		resetBuffers();
         drawGraphics.drawImage(tempDrawBuffer, 0, 0, null);
-        flush();
 	}
 
 	/**
@@ -480,5 +504,17 @@ final class Screen extends JComponent {
 	public void text(int x, int y, String s) {
         drawGraphics.drawString(s, x, y + charAscent);
 	}
+    
+    /**
+     * Implments the zoom command.
+     * @param factor must be greater than 0
+     */
+    public void zoom(int factor) {
+        if(zoomFactor > 0) {
+            zoomFactor = factor;
+            setPreferredSize(new Dimension(zoomFactor*bufferWidth, zoomFactor*bufferHeight));
+            invalidate();
+        }
+    }
 	
 }
