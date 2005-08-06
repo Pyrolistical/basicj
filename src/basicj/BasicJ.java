@@ -73,7 +73,7 @@ public class BasicJ extends JFrame {
      * 
      * @see #autoFlush(long)
      */
-    private static final long INITAL_FLUSHRATE = 100;
+    private static final long INITAL_FLUSHRATE = 250;
 	
 	/**
 	 * The screen object that implements visual and event commands.
@@ -252,7 +252,8 @@ public class BasicJ extends JFrame {
 	 */
 	public void screen(int width, int height) {
 		scr.screen(width, height);
-		pack();
+        pack();
+        flush();
 	}
 	
 	/**
@@ -364,18 +365,28 @@ public class BasicJ extends JFrame {
      * manually (needed for animation/performance) set the rate to 0, and use
      * the flush command.
      *  
-     * @param rate
+     * @param rate units in milliseconds and must be non-negative
      * @see #flush()
      */
     public void autoFlush(long rate) {
         if(rate > 0) {
             autoFlusher = new Timer();
             autoFlusher.scheduleAtFixedRate(new AutoFlushTask(), 0, rate);
-        } else {
+        } else if(rate == 0) {
             if(autoFlusher != null) {
                 autoFlusher.cancel();
             }
         }
+    }
+    
+    /**
+     * Sets the zoom factor.
+     * @param factor must be greater than 1
+     */
+    public void zoom(int factor) {
+        scr.zoom(factor);
+        pack();
+        flush();
     }
     
     /**
