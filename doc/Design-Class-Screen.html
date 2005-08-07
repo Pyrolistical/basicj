@@ -2,5 +2,5 @@
 <h1>Class Screen Design</h1>
 <p>Each print command is stored in a list.  Draw commands are also stored in a buffer.  When flushed, the list of print commands are formated for the current screen size and then drawn to the back buffer.  The draw buffer is overlayed, and then the back buffer is swaped on to the front buffer.  The clear command deletes all items from the print command list and clears the draw buffer.</p>
 <p>The print commands are stored in a list of Pairs consisting of a Color and a StringBuffer.  Any '\n' characters are converted into hardBreaks, and softBreaks are added at screen width.</p>
-<p>*** TO BE UPDATED ON FENSIBLITY *** The zoom command is infensible to implement using the getScaledInstance() method from BufferedImage</p>
+<p>The zoom command is implemented using the getScaledInstance() method from the Image class</p>
 <p>Text printed will be fixed length.  If the print/println command exceeds the width of the screen, then the text will warp.  The text command will not do this however.  If the text lines exceede the height of the screen, the oldest lines are deleted and the text is shuffled up.</p>
