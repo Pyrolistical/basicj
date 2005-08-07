@@ -266,7 +266,7 @@ public class BasicJ extends JFrame {
 	}
 	
 	/**
-	 * Returns the current height of the screen
+	 * Returns the current height of the screen.
 	 * The width returned is the same height defined by the
 	 * <code>screen</code> command.
 	 */
