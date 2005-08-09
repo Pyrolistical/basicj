@@ -67,6 +67,8 @@ public class BasicJ extends JFrame {
 	public static final int yellow      = Colors.yellow;
 	public static final int white       = Colors.white;
     
+    public static final double PI = Math.PI;
+    public static final double E = Math.E;
     
     /**
      * The inital flush rate.
@@ -387,6 +389,424 @@ public class BasicJ extends JFrame {
         scr.zoom(factor);
         pack();
         flush();
+    }
+    
+    /**
+     * Returns the absolute value.
+     * If a > 0, a otherwise if a < 0, -a.
+     */
+    public static double abs(double a) {
+        return Math.abs(a);
+    }
+    
+    /**
+     * Returns the absolute value.
+     * If a > 0, a otherwise if a < 0, -a.
+     */
+    public static float abs(float a) {
+        return Math.abs(a);
+    }
+    
+    /**
+     * Returns the absolute value.
+     * If a > 0, a otherwise if a < 0, -a.
+     */
+    public static int abs(int a) {
+        return Math.abs(a);
+    }
+    
+    /**
+     * Returns the absolute value.
+     * If a > 0, a otherwise if a < 0, -a.
+     */
+    public static long abs(long a) {
+        return Math.abs(a);
+    }
+    
+    /**
+     * Returns the arc-cosine value in degrees.
+     * Prints a warning to System.err if parameter is less than -1 or greater
+     * than 1.
+     */
+    public static double acos(double a) {
+        if(a < -1 || a > 1)
+            System.err.println("--WARNING--    acos(" + a + "), " + a + " must be between -1 and 1.  " + a + " is out of range.");
+        return Math.toDegrees(Math.acos(a));
+    }
+    
+    /**
+     * Returns the arc-cosine value in degrees.
+     * Prints a warning to System.err if parameter is less than -1 or greater
+     * than 1.
+     */
+    public static float acos(float a) {
+        return (float) acos((double) a);
+    }
+    
+    /**
+     * Returns the arc-sine value in degrees.
+     * Prints a warning to System.err if parameter is less than -1 or greater
+     * than 1.
+     */
+    public static double asin(double a) {
+        if(a < -1 || a > 1)
+            System.err.println("--WARNING--    asin(" + a + "), " + a + " must be between -1 and 1.  " + a + " is out of range.");
+        return Math.toDegrees(Math.asin(a));
+    }
+    
+    /**
+     * Returns the arc-sine value in degrees.
+     * Prints a warning to System.err if parameter is less than -1 or greater
+     * than 1.
+     */
+    public static float asin(float a) {
+        return (float) asin((double) a);
+    }
+    
+    /**
+     * Returns the arc-tangent value in degrees.
+     */
+    public static double atan(double a) {
+        return Math.toDegrees(Math.atan(a));
+    }
+    
+    /**
+     * Returns the arc-tangent value in degrees.
+     */
+    public static float atan(float a) {
+        return (float) Math.toDegrees(Math.atan(a));
+    }
+    
+    /**
+     * Returns the arc-tangent value in degrees.
+     * This returns the same value as atan(a/b) if b == 0, if b == 0, then
+     * atan(a/b) returns 90 for a > 0 and -90 for a < 0.
+     */
+    public static double atan2(double a, double b) {
+        return Math.toDegrees(Math.atan2(a, b));
+    }
+    
+    /**
+     * Returns the arc-tangent value in degrees.
+     * This returns the same value as atan(a/b) if b == 0, if b == 0, then
+     * atan(a/b) returns 90 for a > 0 and -90 for a < 0.
+     */
+    public static float atan2(float a, float b) {
+        return (float) Math.toDegrees(Math.atan2(a, b));
+    }
+    
+    /**
+     * Returns the ceiling.
+     * Rounds to the nearest integer greater than or equal to a.
+     */
+    public static long ceil(double a) {
+        return (long) Math.ceil(a);
+    }
+    
+    /**
+     * Returns the ceiling.
+     * Rounds to the nearest integer greater than or equal to a.
+     */
+    public static int ceil(float a) {
+        return (int) Math.ceil(a);
+    }
+    
+    /**
+     * Returns the ceiling.
+     * Rounds to the nearest integer greater than or equal to a.
+     * This is a convenient function, since users will use double and int
+     * rather than float or long.
+     */
+    public static int cint(double a) {
+        return (int) Math.ceil(a);
+    }
+    
+    /**
+     * Returns the floor.
+     * Rounds to the nearest integer less than or equal to a.
+     */
+    public static long floor(double a) {
+        return (long) Math.floor(a);
+    }
+    
+    /**
+     * Returns the floor.
+     * Rounds to the nearest integer less than or equal to a.
+     */
+    public static int floor(float a) {
+        return (int) Math.floor(a);
+    }
+    
+    /**
+     * Returns the floor.
+     * Rounds to the nearest integer less than or equal to a.
+     * This is a convenient function, since users will use double and int
+     * rather than float or long.
+     */
+    public static int fint(double a) {
+        return (int) Math.floor(a);
+    }
+    
+    /**
+     * Returns the cosine of a degree.
+     */
+    public static double cos(double a) {
+        return Math.cos(Math.toRadians(a));
+    }
+    
+    /**
+     * Returns the cosine of a degree.
+     */
+    public static float cos(float a) {
+        return (float) Math.cos(Math.toRadians(a));
+    }
+    
+    /**
+     * Returns the sine of a degree.
+     */
+    public static double sin(double a) {
+        return Math.sin(Math.toRadians(a));
+    }
+    
+    /**
+     * Returns the sine of a degree.
+     */
+    public static float sin(float a) {
+        return (float) Math.sin(Math.toRadians(a));
+    }
+    
+    /**
+     * Returns the tangent of a degree.
+     */
+    public static double tan(double a) {
+        return Math.tan(Math.toRadians(a));
+    }
+    
+    /**
+     * Returns the tangent of a degree.
+     */
+    public static float tan(float a) {
+        return (float) Math.tan(Math.toRadians(a));
+    }
+    
+    /**
+     * Returns the exponential value of base e.
+     * Returns e<super>a</super>.
+     */
+    public static double exp(double a) {
+        return Math.exp(a);
+    }
+    
+    /**
+     * Returns the exponential value of base e.
+     * Returns e<super>a</super>.
+     */
+    public static float exp(float a) {
+        return (float) Math.exp(a);
+    }
+    
+    /**
+     * Returns the exponential value of base e.
+     * Returns e<super>a</super> for a >= 0.  Prints a warning if a is less
+     * than 0.
+     */
+    public static int exp(int a) {
+        if(a < 0)
+            System.err.println("--WARNING--    exp(" + a + "), " + a + " must be between greater than or equal to 0.  " + a + " is out of range.");
+        return (int) Math.exp((long) a);
+    }
+    
+    /**
+     * Returns the exponential value of base e.
+     * Returns e<super>a</super> for a >= 0.  Prints a warning if a is less
+     * than 0.
+     */
+    public static long exp(long a) {
+        if(a < 0)
+            System.err.println("--WARNING--    exp(" + a + "), " + a + " must be between greater than or equal to 0.  " + a + " is out of range.");
+        return (long) Math.exp(a);
+    }
+    
+    /**
+     * Returns the logarithm value with base e.
+     * Prints a warning if a is less than or equal to 0.
+     */
+    public static double log(double a) {
+        if(!(a > 0))
+            System.err.println("--WARNING--    log(" + a + "), " + a + " must be between greater than 0.  " + a + " is out of range.");
+        return Math.log(a);
+    }
+    
+    /**
+     * Returns the logarithm value with base e.
+     * Prints a warning if a is less than or equal to 0.
+     */
+    public static float log(float a) {
+        if(!(a > 0))
+            System.err.println("--WARNING--    log(" + a + "), " + a + " must be between greater than 0.  " + a + " is out of range.");
+        return (float) Math.log(a);
+    }
+    
+    /**
+     * Returns the larger value of the two.
+     */
+    public static double max(double a, double b) {
+        return Math.max(a, b);
+    }
+    
+    /**
+     * Returns the larger value of the two.
+     */
+    public static float max(float a, float b) {
+        return Math.max(a, b);
+    }
+    
+    /**
+     * Returns the larger value of the two.
+     */
+    public static int max(int a, int b) {
+        return Math.max(a, b);
+    }
+    
+    /**
+     * Returns the larger value of the two.
+     */
+    public static long max(long a, long b) {
+        return Math.max(a, b);
+    }
+    
+    /**
+     * Returns the smaller value of the two.
+     */
+    public static double min(double a, double b) {
+        return Math.min(a, b);
+    }
+    
+    /**
+     * Returns the smaller value of the two.
+     */
+    public static float min(float a, float b) {
+        return Math.min(a, b);
+    }
+    
+    /**
+     * Returns the smaller value of the two.
+     */
+    public static int min(int a, int b) {
+        return Math.min(a, b);
+    }
+    
+    /**
+     * Returns the smaller value of the two.
+     */
+    public static long min(long a, long b) {
+        return Math.min(a, b);
+    }
+    
+    /**
+     * Returns the power of a to b.
+     * Returns a<super>b</super>.
+     */
+    public static double pow(double a, double b) {
+        return Math.pow(a, b);
+    }
+    
+    /**
+     * Returns the power of a to b.
+     * Returns a<super>b</super>.
+     */
+    public static float pow(float a, float b) {
+        return (float) Math.pow(a, b);
+    }
+    
+    /**
+     * Returns the power of a to b.
+     * Returns a<super>b</super>.  Prints a warning if b is less than 0.
+     */
+    public static int pow(int a, int b) {
+        if(b < 0)
+            System.err.println("--WARNING--    pow(" + a + ", " + b + "), " + b + " must be between greater than or equal to 0.  " + b + " is out of range.");
+        return (int) Math.pow(a, b);
+    }
+    
+    /**
+     * Returns the power of a to b.
+     * Returns a<super>b</super>.  Prints a warning if b is less than 0.
+     */
+    public static long pow(long a, long b) {
+        if(b < 0)
+            System.err.println("--WARNING--    pow(" + a + ", " + b + "), " + b + " must be between greater than or equal to 0.  " + b + " is out of range.");
+        return (long) Math.pow(a, b);
+    }
+    
+    /**
+     * Returns a random value.
+     * The value returned is less than or equal to 0, but strictly less than 1.
+     * @return
+     */
+    public static double random() {
+        return Math.random();
+    }
+    
+    /**
+     * Returns a random integer.
+     * The value returned is between and including a and b.  If a is greater
+     * than b, then a warning is printed and the parameters are switched
+     * internally.
+     */
+    public static int random(int a, int b) {
+        if(a > b) {
+            System.err.println("--WARNING--    random(" + a + ", " + b + "), " + a + " must be less than " + b + ".  Try random(" + b + ", " + a + ") instead.");
+            int temp = a;
+            a = b;
+            b = temp;
+        }
+        Random r = new Random();
+        int diff = b - a;
+        return r.nextInt(diff + 1) + a;
+    }
+    
+    /**
+     * Returns the closest integer to a.
+     */
+    public static long round(double a) {
+        return (long) Math.round(a);
+    }
+    
+    /**
+     * Returns the closest integer to a.
+     */
+    public static int round(float a) {
+        return (int) Math.round(a);
+    }
+    
+    /**
+     * Returns the closest integer to a.
+     * This is a convenient function, since users will use double and int
+     * rather than float or long.
+     */
+    public static int rint(double a) {
+        return (int) Math.round(a);
+    }
+    
+    /**
+     * Returns the square root.
+     * Prints a warning if a is less than 0.
+     */
+    public static double sqrt(double a) {
+        if(a < 0)
+            System.err.println("--WARNING--    sqrt(" + a + "), " + a + " must be between greater than or equal to 0.  " + a + " is out of range.");
+        return Math.sqrt(a);
+    }
+    
+    /**
+     * Returns the square root.
+     * Prints a warning if a is less than 0.
+     */
+    public static float sqrt(float a) {
+        if(a < 0)
+            System.err.println("--WARNING--    sqrt(" + a + "), " + a + " must be between greater than or equal to 0.  " + a + " is out of range.");
+        return (float) Math.sqrt(a);
     }
     
     /**
