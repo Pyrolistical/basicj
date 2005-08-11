@@ -253,6 +253,14 @@ public class BasicJ extends JFrame {
 	 * @param height the height must be greater than 0
 	 */
 	public void screen(int width, int height) {
+        if(width <= 0) {
+            System.err.println("--ERROR--    screen(" + width + ", " + height + "), " + width + " is out of range.  Try a number greater than 0.");
+            return;
+        }
+        if(height <= 0) {
+            System.err.println("--ERROR--    screen(" + width + ", " + height + "), " + height + " is out of range.  Try a number greater than 0.");
+            return;
+        }
 		scr.screen(width, height);
         pack();
         flush();
@@ -282,6 +290,18 @@ public class BasicJ extends JFrame {
 	 * of 0 to 255.
 	 */
 	public void color(int r, int g, int b) {
+        if(r < 0 || r > 255) {
+            System.err.println("--ERROR--    color(" + r + ", " + g + ", " + b + "), " + r + " is out of range.  Try a number between 0 and 255 instead.");
+            return;
+        }
+        if(g < 0 || g > 255) {
+            System.err.println("--ERROR--    color(" + r + ", " + g + ", " + b + "), " + g + " is out of range.  Try a number between 0 and 255 instead.");
+            return;
+        }
+        if(b < 0 || b > 255) {
+            System.err.println("--ERROR--    color(" + r + ", " + g + ", " + b + "), " + b + " is out of range.  Try a number between 0 and 255 instead.");
+            return;
+        }
 		scr.color(new Color(r, g, b));
 	}
 	
@@ -292,6 +312,17 @@ public class BasicJ extends JFrame {
 	public void color(int c) {
 		scr.color(Colors.toColor(c));
 	}
+    
+    /**
+     * Sets the thickness of the lines drawn by line, and circle.
+     */
+    public void thickness(int width) {
+        if(width <= 0) {
+            System.err.println("--ERROR--   thickness(" + width + "), " + width + " is out of range.  Try a number greater than 0.");
+            return;
+        }
+        scr.thickness(width);
+    }
 	
 	/**
 	 * Clears the screen.
@@ -306,6 +337,18 @@ public class BasicJ extends JFrame {
 	 * of 0 to 255.
 	 */
 	public void clear(int r, int g, int b) {
+        if(r < 0 || r > 255) {
+            System.err.println("--ERROR--    clear(" + r + ", " + g + ", " + b + "), " + r + " is out of range.  Try a number between 0 and 255 instead.");
+            return;
+        }
+        if(g < 0 || g > 255) {
+            System.err.println("--ERROR--    clear(" + r + ", " + g + ", " + b + "), " + g + " is out of range.  Try a number between 0 and 255 instead.");
+            return;
+        }
+        if(b < 0 || b > 255) {
+            System.err.println("--ERROR--    clear(" + r + ", " + g + ", " + b + "), " + b + " is out of range.  Try a number between 0 and 255 instead.");
+            return;
+        }
 		scr.clear(new Color(r, g, b));
 	}
 	
@@ -378,6 +421,8 @@ public class BasicJ extends JFrame {
             if(autoFlusher != null) {
                 autoFlusher.cancel();
             }
+        } else {
+            System.err.println("--ERROR--    autoFlush(" + rate + "), " + rate + " is out of range.  Try a number greater or equal to 0.");
         }
     }
     
@@ -386,6 +431,10 @@ public class BasicJ extends JFrame {
      * @param factor must be greater than 1
      */
     public void zoom(int factor) {
+        if(factor <= 0) {
+            System.err.println("--ERROR--    zoom(" + factor + "), " + factor + " is out of range.  Try a number greater than 0.");
+            return;
+        }
         scr.zoom(factor);
         pack();
         flush();
@@ -430,7 +479,7 @@ public class BasicJ extends JFrame {
      */
     public static double acos(double a) {
         if(a < -1 || a > 1)
-            System.err.println("--WARNING--    acos(" + a + "), " + a + " must be between -1 and 1.  " + a + " is out of range.");
+            System.err.println("--WARNING--    acos(" + a + "), " + a + " is out of range.  Try a number between -1 and 1.");
         return Math.toDegrees(Math.acos(a));
     }
     
@@ -450,7 +499,7 @@ public class BasicJ extends JFrame {
      */
     public static double asin(double a) {
         if(a < -1 || a > 1)
-            System.err.println("--WARNING--    asin(" + a + "), " + a + " must be between -1 and 1.  " + a + " is out of range.");
+            System.err.println("--WARNING--    asin(" + a + "), " + a + " is out of range.  Try a number between -1 and 1.");
         return Math.toDegrees(Math.asin(a));
     }
     
@@ -612,7 +661,7 @@ public class BasicJ extends JFrame {
      */
     public static int exp(int a) {
         if(a < 0)
-            System.err.println("--WARNING--    exp(" + a + "), " + a + " must be between greater than or equal to 0.  " + a + " is out of range.");
+            System.err.println("--WARNING--    exp(" + a + "), " + a + " is out of range.  Try a number greater than or equal to 0.");
         return (int) Math.exp((long) a);
     }
     
@@ -623,7 +672,7 @@ public class BasicJ extends JFrame {
      */
     public static long exp(long a) {
         if(a < 0)
-            System.err.println("--WARNING--    exp(" + a + "), " + a + " must be between greater than or equal to 0.  " + a + " is out of range.");
+            System.err.println("--WARNING--    exp(" + a + "), " + a + " is out of range.  Try a number greater than or equal to 0.");
         return (long) Math.exp(a);
     }
     
@@ -633,7 +682,7 @@ public class BasicJ extends JFrame {
      */
     public static double log(double a) {
         if(!(a > 0))
-            System.err.println("--WARNING--    log(" + a + "), " + a + " must be between greater than 0.  " + a + " is out of range.");
+            System.err.println("--WARNING--    log(" + a + "), " + a + " is out of range.  Try a number greater than 0.");
         return Math.log(a);
     }
     
@@ -643,7 +692,7 @@ public class BasicJ extends JFrame {
      */
     public static float log(float a) {
         if(!(a > 0))
-            System.err.println("--WARNING--    log(" + a + "), " + a + " must be between greater than 0.  " + a + " is out of range.");
+            System.err.println("--WARNING--    log(" + a + "), " + a + " is out of range.  Try a number greater than 0.");
         return (float) Math.log(a);
     }
     
@@ -725,7 +774,7 @@ public class BasicJ extends JFrame {
      */
     public static int pow(int a, int b) {
         if(b < 0)
-            System.err.println("--WARNING--    pow(" + a + ", " + b + "), " + b + " must be between greater than or equal to 0.  " + b + " is out of range.");
+            System.err.println("--WARNING--    pow(" + a + ", " + b + "), " + b + " is out of range.  Try a number greater than or equal to 0.");
         return (int) Math.pow(a, b);
     }
     
@@ -735,7 +784,7 @@ public class BasicJ extends JFrame {
      */
     public static long pow(long a, long b) {
         if(b < 0)
-            System.err.println("--WARNING--    pow(" + a + ", " + b + "), " + b + " must be between greater than or equal to 0.  " + b + " is out of range.");
+            System.err.println("--WARNING--    pow(" + a + ", " + b + "), " + b + " is out of range.  Try a number greater than or equal to 0.");
         return (long) Math.pow(a, b);
     }
     
@@ -795,7 +844,7 @@ public class BasicJ extends JFrame {
      */
     public static double sqrt(double a) {
         if(a < 0)
-            System.err.println("--WARNING--    sqrt(" + a + "), " + a + " must be between greater than or equal to 0.  " + a + " is out of range.");
+            System.err.println("--WARNING--    sqrt(" + a + "), " + a + " is out of range.  Try a number greater than or equal to 0.");
         return Math.sqrt(a);
     }
     
@@ -805,7 +854,7 @@ public class BasicJ extends JFrame {
      */
     public static float sqrt(float a) {
         if(a < 0)
-            System.err.println("--WARNING--    sqrt(" + a + "), " + a + " must be between greater than or equal to 0.  " + a + " is out of range.");
+            System.err.println("--WARNING--    sqrt(" + a + "), " + a + " is out of range.  Try a number greater than or equal to 0.");
         return (float) Math.sqrt(a);
     }
     
