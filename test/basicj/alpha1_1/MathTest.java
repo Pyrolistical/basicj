@@ -1,3 +1,6 @@
+/*
+ * Created on Aug 8, 2005 by Ronald Chen
+ */
 package basicj.alpha1_1;
 
 import basicj.BasicJ;
