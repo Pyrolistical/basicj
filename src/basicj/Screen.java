@@ -60,7 +60,7 @@ final class Screen extends JComponent {
      * This is updated automatically by the resetBuffers method.
      * @see #drawBuffer
      */
-    private Graphics drawGraphics;
+    private Graphics2D drawGraphics;
 	
 	/**
 	 * Holds the input from print commands.
@@ -230,7 +230,7 @@ final class Screen extends JComponent {
 		backBuffer = new BufferedImage(bufferWidth, bufferHeight, BufferedImage.TYPE_INT_RGB);
 		drawBuffer = new BufferedImage(bufferWidth, bufferHeight, BufferedImage.TYPE_INT_ARGB);
         
-        drawGraphics = drawBuffer.getGraphics();
+        drawGraphics = (Graphics2D) drawBuffer.getGraphics();
 		clearBuffers();
 	}
 	
@@ -423,6 +423,13 @@ final class Screen extends JComponent {
 		fgColor = c;
         drawGraphics.setColor(fgColor);
 	}
+    
+    /**
+     * Implements the thickness command.
+     */
+    public void thickness(int width) {
+        drawGraphics.setStroke(new BasicStroke(width));
+    }
     
 	/**
 	 * Implements the width command.
