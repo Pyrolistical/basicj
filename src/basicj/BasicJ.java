@@ -18,6 +18,7 @@
 package basicj;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 import java.util.Timer;
@@ -90,6 +91,35 @@ public class BasicJ extends JFrame {
      * @see #autoFlush(long)
      */
     private Timer autoFlusher;
+    
+    /**
+     * This is true when mutex is waiting using wait().
+     * 
+     * @see #mutex
+     */
+    private boolean isWaiting;
+    
+    /**
+     * This is true when user has returned input for keypressed().
+     * 
+     * @see #keypressed()
+     */
+    private boolean hasInput;
+    
+    /**
+     * This holds the last key entered by the user.
+     * 
+     * @see #keypressed()
+     */
+    private int lastKey;
+    
+    /**
+     * This mutex is used to synchronize the keyTyped event and the keypressed method.
+     * 
+     * @see #keypressed()
+     * @see #BasicJ(String)
+     */
+    private Object mutex;
 	
 	/**
 	 * Creates a new BasicJ program and sets the title.
@@ -102,6 +132,28 @@ public class BasicJ extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
 		
+        
+        isWaiting = false;
+        hasInput = false;
+        lastKey = -1;
+        mutex = new Object();
+        addKeyListener(new KeyListener() {
+            public void keyPressed(KeyEvent e) {
+            }
+            public void keyReleased(KeyEvent e) {
+            }
+            public void keyTyped(KeyEvent e) {
+                synchronized(mutex) {
+                    if(isWaiting) {
+                        lastKey = (int) e.getKeyChar();
+                        hasInput = true;
+                        mutex.notify();
+                        isWaiting = false;
+                    }
+                }
+            }
+        });
+        
 		scr = new Screen();
 		add(scr);
         
@@ -791,7 +843,6 @@ public class BasicJ extends JFrame {
     /**
      * Returns a random value.
      * The value returned is less than or equal to 0, but strictly less than 1.
-     * @return
      */
     public static double random() {
         return Math.random();
@@ -856,6 +907,201 @@ public class BasicJ extends JFrame {
         if(a < 0)
             System.err.println("--WARNING--    sqrt(" + a + "), " + a + " is out of range.  Try a number greater than or equal to 0.");
         return (float) Math.sqrt(a);
+    }
+    
+    /**
+     * Returns true iff s is a String that represents an integer.
+     */
+    public static boolean isInt(String s) {
+        try {
+            Integer.valueOf(s);
+        } catch(NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Returns true iff s is a String that represents an long.
+     */
+    public static boolean isLong(String s) {
+        try {
+            Long.valueOf(s);
+        } catch(NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Returns true iff s is a String that represents an double.
+     */
+    public static boolean isDouble(String s) {
+        try {
+            Double.valueOf(s);
+        } catch(NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Returns true iff s is a String that represents an float.
+     */
+    public static boolean isFloat(String s) {
+        try {
+            Float.valueOf(s);
+        } catch(NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Returns true iff s is a String that represents an char.
+     */
+    public static boolean isChar(String s) {
+        return s.length() == 1;
+    }
+    
+    /**
+     * Returns the integer represented by s.
+     * If isInt(s) is not true, an error message is printed.
+     */
+    public static int toInt(String s) {
+        if(!isInt(s)) {
+            System.err.println("--ERROR--    toInt(\"" + s + "\"), \"" + s + "\" is not an integer.  Use isInt(\"" + s + "\") to test if it is an integer.");
+            return 0;
+        } else {
+            return Integer.valueOf(s);
+        }
+    }
+    
+    /**
+     * Returns the long represented by s.
+     * If isLong(s) is not true, an error message is printed.
+     */
+    public static long toLong(String s) {
+        if(!isLong(s)) {
+            System.err.println("--ERROR--    toLong(\"" + s + "\"), \"" + s + "\" is not a long.  Use isLong(\"" + s + "\") to test if it is a long.");
+            return 0l;
+        } else {
+            return Long.valueOf(s);
+        }
+    }
+    
+    /**
+     * Returns the double represented by s.
+     * If isDouble(s) is not true, an error message is printed.
+     */
+    public static double toDouble(String s) {
+        if(!isDouble(s)) {
+            System.err.println("--ERROR--    toDouble(\"" + s + "\"), \"" + s + "\" is not a double.  Use isDouble(\"" + s + "\") to test if it is a double.");
+            return 0d;
+        } else {
+            return Double.valueOf(s);
+        }
+    }
+    
+    /**
+     * Returns the float represented by s.
+     * If isFloat(s) is not true, an error message is printed.
+     */
+    public static Float toFloat(String s) {
+        if(!isFloat(s)) {
+            System.err.println("--ERROR--    toFloat(\"" + s + "\"), \"" + s + "\" is not a float.  Use isFloat(\"" + s + "\") to test if it is a float.");
+            return 0f;
+        } else {
+            return Float.valueOf(s);
+        }
+    }
+    
+    /**
+     * Returns the character represented by s.
+     * If isChar(s) is not true, an error message is printed.
+     */
+    public static char toChar(String s) {
+        if(!isChar(s)) {
+            System.err.println("--ERROR--    toChar(\"" + s + "\"), \"" + s + "\" is not a char.  Use isChar(\"" + s + "\") to test if it is a char.");
+            return (char) 0;
+        } else {
+            return s.charAt(0);
+        }
+    }
+    
+    /**
+     * Returns the next key pressed.
+     * Blocks until input is received.  Currently only supports regular
+     * letters, digits, symbols, esc, backspace, delete, enter, and space.
+     * Arrow keys for example are not implemented yet.
+     */
+    public int keypressed() {
+        synchronized(mutex) {
+            isWaiting = true;
+            try {
+                while(!hasInput)
+                    mutex.wait();
+            } catch(InterruptedException e) {
+            }
+            hasInput = false;
+        }
+        return lastKey;
+    }
+    
+    /**
+     * Prompts the user for input.
+     */
+    public String input() {
+        StringBuffer sb = new StringBuffer();
+        int nextChar = -1;
+        while(nextChar != KeyEvent.VK_ENTER) {
+            print("_");
+            nextChar = keypressed();
+            scr.backspace('_');
+            switch(nextChar) {
+                case KeyEvent.VK_ENTER:
+                case KeyEvent.VK_ESCAPE:
+                case KeyEvent.VK_DELETE:
+                    continue;
+                    
+                case KeyEvent.VK_BACK_SPACE:
+                    if(sb.length() > 0) {
+                        scr.backspace(sb.charAt(sb.length() - 1));
+                        sb.deleteCharAt(sb.length() - 1);
+                        flush();
+                    }
+                break;
+                
+                
+                default:
+                    print((char) nextChar);
+                    sb.append((char) nextChar);
+                    flush();
+                break;
+            }
+        }
+        println();
+        return sb.toString();
+    }
+    
+    /**
+     * Prompts the user for input with a label.
+     */
+    public String input(String label) {
+        print(label);
+        return input();
+    }
+    
+    /**
+     * Pauses execution for some milliseconds.
+     */
+    public void pause(long milliseconds) {
+        synchronized(mutex) {
+            try {
+                mutex.wait(milliseconds);
+            } catch(InterruptedException e) {
+            }
+        }
     }
     
     /**
