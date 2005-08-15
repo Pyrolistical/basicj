@@ -67,7 +67,7 @@ final class Screen extends JComponent {
 	 * This list also stores the current foreground color, for rendering 
 	 * later.  The clear command empties this buffer.
 	 */
-	private java.util.List<Pair<Color, StringBuffer>> printBuffer;
+	private LinkedList<Pair<Color, StringBuffer>> printBuffer;
 	
 	/**
 	 * Holds the last print command.
@@ -402,7 +402,7 @@ final class Screen extends JComponent {
 		lastPrint = new Pair<Color, StringBuffer>(fgColor, new StringBuffer());
 		printBuffer.add(lastPrint);
 		formatedPrintBuffer.clear();
-		clearBuffers();
+		resetBuffers();
         flush();
 	}
 	
@@ -479,6 +479,20 @@ final class Screen extends JComponent {
 			printBuffer.add(lastPrint);
 		}
 	}
+    
+    /**
+     * Deletes the latest printed character iff it matches c.
+     */
+    public void backspace(char c) {
+        while(printBuffer.size() > 1 && lastPrint.getY().length() == 0) {
+            printBuffer.removeLast();
+            lastPrint = printBuffer.getLast();
+        }
+        StringBuffer lastString = lastPrint.getY();
+        if(lastString.charAt(lastString.length() - 1) == c) {
+            lastString.deleteCharAt(lastString.length() - 1);
+        }
+    }
 	
 	/**
 	 * Implements the point command.
