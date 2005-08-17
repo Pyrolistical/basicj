@@ -537,5 +537,26 @@ final class Screen extends JComponent {
             invalidate();
         }
     }
+    
+    /**
+     * Returns the current zoom level.
+     */
+    public int getZoom() {
+        return zoomFactor;
+    }
+    
+    /**
+     * Saves the current view of the backbuffer to file.
+     */
+    public void save(String filename) {
+        updateBackBuffer();
+        Image output;
+        if(zoomFactor > 1) {
+            output = backBuffer.getScaledInstance(zoomFactor*bufferWidth, zoomFactor*bufferHeight, Image.SCALE_REPLICATE);
+        } else {
+            output = backBuffer;
+        }
+        BMPEncoder.encode(filename, output);
+    }
 	
 }
