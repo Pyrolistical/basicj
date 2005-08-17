@@ -19,7 +19,11 @@ package basicj;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+
 import java.util.*;
 import java.util.Timer;
 
@@ -120,6 +124,11 @@ public class BasicJ extends JFrame {
      * @see #BasicJ(String)
      */
     private Object mutex;
+    
+    /**
+     * This saves the user's zoom level before it was overrided.
+     */
+    private int userZoom;
 	
 	/**
 	 * Creates a new BasicJ program and sets the title.
@@ -131,8 +140,15 @@ public class BasicJ extends JFrame {
 		super(((title.equals(""))?"":title + " - ") + "BasicJ");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
-		
         
+        // use the system's look and feel
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch(Exception e) {
+        }
+        SwingUtilities.updateComponentTreeUI(this);
+        
+        // keyboard events
         isWaiting = false;
         hasInput = false;
         lastKey = -1;
@@ -152,6 +168,106 @@ public class BasicJ extends JFrame {
                     }
                 }
             }
+        });
+        
+        // popup menu
+        final JPopupMenu popup = new JPopupMenu();
+        JMenuItem jmi = new JMenuItem("Save as Bitmap...");
+        jmi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                final JFileChooser jfc = new JFileChooser();
+                jfc.setFileFilter(new FileFilter() {
+                    public String getDescription() {
+                        return "Bitmap Files";
+                    }
+                    
+                    public boolean accept(File f) {
+                        String filename = f.getName().trim();
+                        return f.isDirectory() || filename.substring(filename.lastIndexOf(".") + 1).toLowerCase().equals("bmp");
+                    }
+                });
+                if(jfc.showSaveDialog((Component) e.getSource()) == JFileChooser.APPROVE_OPTION) {
+                    Thread t = new Thread() {
+                        public void run() {
+                            scr.save(jfc.getSelectedFile().toString());
+                        }
+                    };
+                    t.start();
+                }
+            }
+        });
+        popup.add(jmi);
+        
+        userZoom = -1;
+        JMenu jm = new JMenu("Override Zoom");
+        ButtonGroup bg = new ButtonGroup();
+        JRadioButtonMenuItem jrbmi = new JRadioButtonMenuItem("Off");
+        jrbmi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(((JRadioButtonMenuItem) e.getSource()).isSelected()) {
+                    if(userZoom != -1) {
+                        zoom(userZoom);
+                        userZoom = -1;
+                    }
+                }
+            }
+        });
+        jrbmi.setSelected(true);
+        bg.add(jrbmi);
+        jm.add(jrbmi);
+        jm.addSeparator();
+        jrbmi = new JRadioButtonMenuItem("2x");
+        jrbmi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(userZoom == -1)
+                    userZoom = scr.getZoom();
+                zoom(2);
+            }
+        });
+        bg.add(jrbmi);
+        jm.add(jrbmi);
+        jrbmi = new JRadioButtonMenuItem("3x");
+        jrbmi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(userZoom == -1)
+                    userZoom = scr.getZoom();
+                zoom(3);
+            }
+        });
+        bg.add(jrbmi);
+        jm.add(jrbmi);
+        jrbmi = new JRadioButtonMenuItem("4x");
+        jrbmi.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(userZoom == -1)
+                    userZoom = scr.getZoom();
+                zoom(4);
+            }
+        });
+        bg.add(jrbmi);
+        jm.add(jrbmi);
+        popup.add(jm);
+        
+        // mouse button events
+        addMouseListener(new MouseListener() {
+            public void mouseClicked(MouseEvent e) {
+            }
+            
+            public void mouseEntered(MouseEvent e) {
+            }
+            
+            public void mouseExited(MouseEvent e) {
+            }
+            
+            public void mousePressed(MouseEvent e) {
+            }
+            
+            public void mouseReleased(MouseEvent e) {
+                if(e.isPopupTrigger()) {
+                    popup.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+            
         });
         
 		scr = new Screen();
@@ -1102,6 +1218,13 @@ public class BasicJ extends JFrame {
             } catch(InterruptedException e) {
             }
         }
+    }
+    
+    /**
+     * Saves the current view to file.
+     */
+    public void save(String filename) {
+        scr.save(filename);
     }
     
     /**
