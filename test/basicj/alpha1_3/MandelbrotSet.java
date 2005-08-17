@@ -46,7 +46,7 @@ public class MandelbrotSet extends BasicJ {
                 System.out.println("Done..." + rint((float) 100*x/(width() - 1)) + "%");
         }
         flush();
-        save("Mandelbrot Set.bmp");
+        save("test/basicj/alpha1_3/Mandelbrot Set.bmp");
     }
     
     public static void main(String[] args) {
