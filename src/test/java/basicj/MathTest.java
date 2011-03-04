@@ -1,7 +1,7 @@
 /*
  * Created on Aug 8, 2005 by Ronald Chen
  */
-package basicj.alpha1_1;
+package basicj;
 
 import basicj.BasicJ;
 import junit.framework.TestCase;

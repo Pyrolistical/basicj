@@ -1,4 +1,4 @@
-package basicj.alpha1_0;
+package basicj.samples;
 
 import basicj.BasicJ;
 

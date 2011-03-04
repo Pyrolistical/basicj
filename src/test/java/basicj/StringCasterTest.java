@@ -1,4 +1,4 @@
-package basicj.alpha1_2;
+package basicj;
 
 import static basicj.BasicJ.*;
 import junit.framework.TestCase;

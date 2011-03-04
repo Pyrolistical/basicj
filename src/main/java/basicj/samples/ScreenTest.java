@@ -15,7 +15,7 @@
  along with BasicJ; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  ----------------------------------------------------------------------------*/
-package basicj.alpha1_0;
+package basicj.samples;
 
 import basicj.BasicJ;
 

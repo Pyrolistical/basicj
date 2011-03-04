@@ -2,7 +2,7 @@
  * Created on Feb 28, 2005 by Ronald Chen
  */
 
-package basicj.alpha1_0;
+package basicj.samples;
 
 import basicj.BasicJ;;
 
