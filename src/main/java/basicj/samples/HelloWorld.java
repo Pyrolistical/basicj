@@ -4,7 +4,7 @@
 
 package basicj.samples;
 
-import basicj.BasicJ;;
+import basicj.BasicJ;
 
 /**
  * HelloWorld
